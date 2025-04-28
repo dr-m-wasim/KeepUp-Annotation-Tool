@@ -170,6 +170,7 @@ class PostFeatures(models.Model):
     annotatorTwo_post_label = models.TextField(db_column='annotatorTwo_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     annotatorThree_post_label = models.TextField(db_column='annotatorThree_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
 
+
     class Meta:
         managed = False
         db_table = 'post_features'

@@ -130,7 +130,9 @@
                         <th>Likes</th>
                         <th>Views</th>
                         <th>Shares</th>
-                        <th>Annotators</th> <!-- New Column -->
+                        <th>A. One</th> <!-- New Column -->
+                        <th>A. Two</th> <!-- New Column -->
+                        <th>A. Three</th> <!-- New Column -->
                     </tr>
                 </thead>
                 <tbody>
@@ -147,13 +149,10 @@
                         <td>{{ post.likescount }}</td>
                         <td>{{ post.views }}</td>
                         <td>{{ post.shares }}</td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <input type="checkbox" disabled {% if post.annotator1 %}checked{% endif %}>
-                                <input type="checkbox" disabled {% if post.annotator2 %}checked{% endif %}>
-                                <input type="checkbox" disabled {% if post.annotator3 %}checked{% endif %}>
-                            </div>
-                        </td>
+                        <td>{{ post.annotatorOne_post_label }}</td>
+                        <td>{{ post.annotatorTwo_post_label }}</td>
+                        <td>{{ post.annotatorThree_post_label }}</td>
+
                     </tr>
                     {% empty %}
                     <tr>
