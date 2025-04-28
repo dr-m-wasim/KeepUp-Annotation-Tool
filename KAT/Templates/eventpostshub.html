@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>EventPostHub - KAT by @satoshi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #f8f9fa, #e0eafc);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #007bff;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .container {
+            flex: 1;
+        }
+
+        .event-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-info h2 {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .event-info p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        tbody tr:hover {
+            background-color: #e3f2fd;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 1rem;
+            margin-top: auto;
+        }
+
+        footer span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="text-center">
+        <div class="container">
+            <h1>🎉 Event Post Hub</h1>
+            <p>Posts related to the selected Event</p>
+        </div>
+    </header>
+
+    <div class="container my-5">
+        <div class="event-info text-center">
+            <h2>Event Information</h2>
+            <p><strong>Student ID:</strong> {{ event.student_id }}</p>
+            <p><strong>Student Name:</strong> {{ event.student_name }}</p>
+            <p><strong>Event ID:</strong> {{ event.event_id }}</p>
+            <p><strong>Event Name:</strong> {{ event.event_name }}</p>
+            <p><strong>Event claim:</strong> {{ event.claim }}</p>
+        </div>
+
+        <h3 class="text-center mb-4">📄 Posts Related to Event</h3>
+        <div class="text-center mb-3">
+            <a href="{% url 'post_editor' event.event_id %}" class="btn btn-primary">Open Post Editor</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-striped table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th>Post ID</th>
+                        <th>Post Title</th>
+                        <th>Post Label</th>
+                        <th>Post URL</th>
+                        <th>Platform</th>
+                        <th>Likes</th>
+                        <th>Views</th>
+                        <th>Shares</th>
+                        <th>Annotators</th> <!-- New Column -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <td>{{ post.post_id }}</td>
+                        <td>{{ post.post_title }}</td>
+                        <td>{{ post.post_label }}</td>
+                        <td>
+                            <a href="{{ post.post_url }}" target="_blank" class="btn btn-sm btn-outline-primary">View
+                                Post</a>
+                        </td>
+                        <td>{{ post.platform }}</td>
+                        <td>{{ post.likescount }}</td>
+                        <td>{{ post.views }}</td>
+                        <td>{{ post.shares }}</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <input type="checkbox" disabled {% if post.annotator1 %}checked{% endif %}>
+                                <input type="checkbox" disabled {% if post.annotator2 %}checked{% endif %}>
+                                <input type="checkbox" disabled {% if post.annotator3 %}checked{% endif %}>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No posts available for this event.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        Crafted with ❤️ by <span>Satoshi</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

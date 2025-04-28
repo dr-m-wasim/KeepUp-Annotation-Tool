@@ -166,6 +166,9 @@ class PostFeatures(models.Model):
     views = models.TextField(blank=True, null=True)
     shares = models.TextField(blank=True, null=True)
     reposts = models.TextField(blank=True, null=True)
+    annotatorOne_post_label = models.TextField(db_column='annotatorOne_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    annotatorTwo_post_label = models.TextField(db_column='annotatorTwo_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    annotatorThree_post_label = models.TextField(db_column='annotatorThree_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
 
     class Meta:
         managed = False
