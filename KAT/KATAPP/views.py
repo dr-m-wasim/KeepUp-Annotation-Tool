@@ -52,6 +52,15 @@ def post_editor(request, event_id):
     
     current_post = posts[post_index]
 
+     # Set selected label for pre-selecting in form
+    selected_label = ""
+    if annotator == 'annotatorone':
+        selected_label = current_post.annotatorOne_post_label
+    elif annotator == 'annotatortwo':
+        selected_label = current_post.annotatorTwo_post_label
+    elif annotator == 'annotatorthree':
+        selected_label = current_post.annotatorThree_post_label
+
     if request.method == 'POST':
         selected_label = request.POST.get('post_label')
         if selected_label and current_post:
@@ -69,10 +78,12 @@ def post_editor(request, event_id):
             next_index = post_index  # Stay at last post
         return redirect(f'/event/{event_id}/post_editor/?index={next_index}')
     
+    
     return render(request, 'post_editor.html', {
         'event': event,
         'posts': posts,
         'current_post': current_post,
         'post_index': post_index,
         'annotator': annotator,
+        'selected_label': selected_label,  # <-- Add this here
     })
