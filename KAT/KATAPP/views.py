@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Events, PostFeatures
+from .models import Events, PostFeatures, Comments
 from django.urls import reverse
 
 def annotator_select(request):
@@ -87,3 +87,12 @@ def post_editor(request, event_id):
         'annotator': annotator,
         'selected_label': selected_label,  # <-- Add this here
     })
+
+
+def post_comments_view(request, post_id):
+    comments = Comments.objects.filter(post_id=post_id)
+    context = {
+        'post_id': post_id,
+        'comments': comments,
+    }
+    return render(request, 'postcommenthub.html', context)

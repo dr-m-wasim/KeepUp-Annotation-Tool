@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PostCommentHub - KAT by @satoshi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #f8f9fa, #e0eafc);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header, footer {
+            background: #007bff;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+        .container {
+            flex: 1;
+        }
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        thead th {
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+            text-align: center;
+        }
+        tbody tr:hover {
+            background-color: #e3f2fd;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>💬 Post Comment Hub</h1>
+    <p>Comments related to Post ID: {{ post_id }}</p>
+</header>
+
+<div class="container my-5">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Commenter Name</th>
+                    <th>Comment Text</th>
+                    <th>Likes</th>
+                    <th>Label</th>
+                    <th>A. One</th>
+                    <th>A. Two</th>
+                    <th>A. Three</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                <tr>
+                    <td>{{ comment.commenter_name }}</td>
+                    <td>{{ comment.commenttext }}</td>
+                    <td>{{ comment.likescount_on_comment }}</td>
+                    <td>{{ comment.comment_label }}</td>
+                    <td>{{ comment.annotatorOne_comment_label }}</td>
+                    <td>{{ comment.annotatorTwo_comment_label }}</td>
+                    <td>{{ comment.annotatorThree_comment_label }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No comments found for this post.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer>
+    Crafted with ❤️ by <span>Satoshi</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -137,8 +137,7 @@
                 </thead>
                 <tbody>
                     {% for post in posts %}
-                    <tr>
-                        <td>{{ post.post_id }}</td>
+                    <tr onclick="window.location.href='{% url 'postcomments' post.post_id %}'" style="cursor: pointer;">                        <td>{{ post.post_id }}</td>
                         <td>{{ post.post_title }}</td>
                         <td>{{ post.post_label }}</td>
                         <td>

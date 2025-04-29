@@ -96,6 +96,7 @@ class AuthUserUserPermissions(models.Model):
 
 
 class Comments(models.Model):
+    comment_id = models.AutoField(primary_key=True)  # or IntegerField if manually set
     post_id = models.IntegerField(db_column='post-id', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     commenttext = models.TextField(blank=True, null=True)
     commenter_name = models.TextField(db_column='commenter name', blank=True, null=True)  # Field renamed to remove unsuitable characters.
