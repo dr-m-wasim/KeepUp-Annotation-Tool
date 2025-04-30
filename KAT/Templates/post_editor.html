@@ -88,56 +88,62 @@
 <body>
 
   <header class="text-center">
-    <div class="container">
-      <h1>📝 Post Editor</h1>
-      <p>Edit posts for event: {{ event.event_name }}</p>
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+      <div>
+        <h1>📝 Post Editor</h1>
+        <br>
+        <p>{{event.event_id}} : {{ event.claim }}</p>
+      </div>
+      <div class="mt-3 mt-md-0">
+        <a href="{% url 'eventposts' event.event_id %}" class="btn btn-light btn-sm text-primary fw-semibold shadow-sm">
+          ⬅️ Back to Event Hub
+        </a>
+      </div>
     </div>
   </header>
-
-  <div class="container my-5">
+  
+  <div class="container my-2">
     <div class="editor-card">
         {% if current_post %}
         <h3 class="mb-4">Post ID: {{ current_post.post_id }}</h3>
       
         <!-- Section: Post Info -->
-        <h5 class="text-primary">📄 Post Details</h5>
         <div class="row mb-3">
-          <div class="col-md-4 fw-semibold">Title:</div>
+          <div class="col-md-4 fw-semibold">Post Title:</div>
           <div class="col-md-8">{{ current_post.post_title }}</div>
       
           <div class="col-md-4 fw-semibold">URL:</div>
           <div class="col-md-8"><a href="{{ current_post.post_url }}" target="_blank">View Post</a></div>
         </div>
-        <hr>      
+        <hr>
       
-        <div class="col-md-4 fw-semibold">Student Label:</div>
-        <div class="col-md-8">{{ current_post.post_label }}</div>
+        <div class="col-md-4 fw-semibold">Student Label : {{ current_post.post_label }}</div>
         </div>
         <hr>
       
         <!-- Label selection -->
-        <form method="POST">
+        <form method="POST" class="container my-2">
           {% csrf_token %}
           <input type="hidden" name="post_index" value="{{ post_index }}">
-      
+
           <div class="mb-3">
             <label for="post_label" class="form-label">Select Label:</label>
             <select class="form-select" id="post_label" name="post_label" required>
               <option value="">Choose a label</option>
-              <option value="0" {% if selected_label|default:"" == "0" %}selected{% endif %}>0</option>
-              <option value="1" {% if selected_label|default:"" == "1" %}selected{% endif %}>1</option>
+              <option value="0" {% if selected_label|default:"" == "0" %}selected{% endif %}>Fake</option>
+              <option value="1" {% if selected_label|default:"" == "1" %}selected{% endif %}>Real</option>
             </select>
           </div>
-      
+
           <div class="btn-group">
             {% if post_index > 0 %}
             <a href="?index={{ post_index|add:-1 }}" class="btn btn-secondary">⬅️ Previous</a>
             {% else %}
             <button class="btn btn-secondary" disabled>⬅️ Previous</button>
             {% endif %}
-      
+
             <button type="submit" class="btn btn-primary">💾 Save Label</button>
-      
+
             {% if post_index < posts|length|add:"-1" %}
             <a href="?index={{ post_index|add:1 }}" class="btn btn-secondary">Next ➡️</a>
             {% else %}
