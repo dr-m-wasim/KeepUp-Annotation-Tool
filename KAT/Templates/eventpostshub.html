@@ -124,24 +124,27 @@
                     <tr>
                         <th>Post ID</th>
                         <th>Post Title</th>
-                        <th>Post Label</th>
                         <th>Post URL</th>
                         <th>Platform</th>
                         <th>Likes</th>
                         <th>Views</th>
                         <th>Shares</th>
+                        <th>Student Label</th>
                         {% if  request.session.annotator == 'annotatorone' %}
                         <th>A. One</th> <!-- New Column -->
                         {% endif %}
+                        {% if  request.session.annotator == 'annotatortwo' %}
                         <th>A. Two</th> <!-- New Column -->
+                        {% endif %}
+                        {% if  request.session.annotator == 'annotatorthree' %}
                         <th>A. Three</th> <!-- New Column -->
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for post in posts %}
                     <tr onclick="window.location.href='{% url 'postcomments' post.post_id %}'" style="cursor: pointer;">                        <td>{{ post.post_id }}</td>
                         <td>{{ post.post_title }}</td>
-                        <td>{{ post.post_label }}</td>
                         <td>
                             <a href="{{ post.post_url }}" target="_blank" class="btn btn-sm btn-outline-primary">View
                                 Post</a>
@@ -150,12 +153,16 @@
                         <td>{{ post.likescount }}</td>
                         <td>{{ post.views }}</td>
                         <td>{{ post.shares }}</td>
+                        <td>{{ post.post_label }}</td>
                         {% if  request.session.annotator == 'annotatorone' %}
                         <td>{{ post.annotatorOne_post_label }}</td>
                         {% endif %}
+                        {% if  request.session.annotator == 'annotatortwo' %}
                         <td>{{ post.annotatorTwo_post_label }}</td>
+                        {% endif %}
+                        {% if  request.session.annotator == 'annotatorthree' %}
                         <td>{{ post.annotatorThree_post_label }}</td>
-
+                        {% endif %}
                     </tr>
                     {% empty %}
                     <tr>

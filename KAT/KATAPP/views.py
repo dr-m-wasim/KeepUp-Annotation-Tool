@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Events, PostFeatures, Comments
 from django.urls import reverse
+from django.http import HttpResponseBadRequest
 
 def annotator_select(request):
     if request.method == 'POST':
@@ -95,4 +96,30 @@ def post_comments_view(request, post_id):
         'post_id': post_id,
         'comments': comments,
     }
-    return render(request, 'postcommenthub.html', context)
+    return render(request, 'postcommenthub.html', context)\
+    
+def save_comment(request, post_id):
+    if request.method == 'POST':
+        annotator = request.session.get('annotator', None)
+        comment_text = request.POST.get('comment', '').strip()
+
+        if not annotator:
+            return redirect('annotator_select')
+
+        if not comment_text:
+            return HttpResponseBadRequest("Comment cannot be empty.")
+
+        # Check if comment exists from this annotator
+        comment_obj, created = Comments.objects.get_or_create(
+            post_id=post_id,
+            annotator=annotator,
+            defaults={'comment': comment_text}
+        )
+
+        if not created:
+            comment_obj.comment = comment_text
+            comment_obj.save()
+
+        return redirect('postcomments', post_id=post_id)
+
+    return HttpResponseBadRequest("Invalid request method.")
