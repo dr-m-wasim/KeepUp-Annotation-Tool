@@ -98,27 +98,31 @@
                 <thead>
                     <tr>
                         <th>Student ID</th>
-                        <th>Student Name</th>
-                        <th>Event ID</th>
+                        <!-- <th>Student Name</th> -->
+                        <!-- <th>Event ID</th> -->
                         <th>Event Name</th>
                         <th>Claim</th>
                         <th>Claim URL</th>
-                        <th>Post URL</th>
+                        <th>Social Media Post</th>
+                        <th>Event Posts</th>
                         <th>Label</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for event in events %}
-                    <tr onclick="window.location.href='{% url 'eventposts' event.event_id %}'">
+                    <tr>
                         <td>{{ event.student_id }}</td>
-                        <td>{{ event.student_name }}</td>
-                        <td>{{ event.event_id }}</td>
+                        <!-- <td>{{ event.student_name }}</td>
+                        <td>{{ event.event_id }}</td> -->
                         <td>{{ event.event_name }}</td>
                         <td>{{ event.claim }}</td>
                         <td><a href="{{ event.claim_url }}" target="_blank"
                                 class="btn btn-sm btn-outline-primary">View</a></td>
                         <td><a href="{{ event.posturl }}" target="_blank"
                                 class="btn btn-sm btn-outline-success">Post</a></td>
+                        <td><a href="{% url 'eventposts' event.event_id %}"
+                            class="btn btn-sm btn-outline-success">Post</a></td>
+                               
                         <td>{{ event.label }}</td>
                     </tr>
                     {% endfor %}

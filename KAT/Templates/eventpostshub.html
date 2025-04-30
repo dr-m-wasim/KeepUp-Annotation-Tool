@@ -130,7 +130,9 @@
                         <th>Likes</th>
                         <th>Views</th>
                         <th>Shares</th>
+                        {% if  request.session.annotator == 'annotatorone' %}
                         <th>A. One</th> <!-- New Column -->
+                        {% endif %}
                         <th>A. Two</th> <!-- New Column -->
                         <th>A. Three</th> <!-- New Column -->
                     </tr>
@@ -148,7 +150,9 @@
                         <td>{{ post.likescount }}</td>
                         <td>{{ post.views }}</td>
                         <td>{{ post.shares }}</td>
+                        {% if  request.session.annotator == 'annotatorone' %}
                         <td>{{ post.annotatorOne_post_label }}</td>
+                        {% endif %}
                         <td>{{ post.annotatorTwo_post_label }}</td>
                         <td>{{ post.annotatorThree_post_label }}</td>
 
