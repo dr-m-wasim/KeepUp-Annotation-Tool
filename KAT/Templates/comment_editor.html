@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Comment Editor - KAT by @satoshi</title>
@@ -11,24 +12,29 @@
       display: flex;
       flex-direction: column;
     }
+
     header {
       background: #007bff;
       color: white;
       padding: 30px 0;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
+
     header h1 {
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 0.3rem;
     }
+
     header p {
       font-size: 1.1rem;
       margin-bottom: 0;
     }
+
     .container {
       flex: 1;
     }
+
     .editor-card {
       background: white;
       padding: 40px 30px;
@@ -37,6 +43,17 @@
       max-width: 750px;
       margin: 0 auto;
     }
+
+    .editor-card h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .editor-card p {
+      margin-bottom: 0.7rem;
+      font-size: 1rem;
+    }
+
     footer {
       background-color: #007bff;
       color: white;
@@ -45,6 +62,7 @@
       font-size: 1rem;
       margin-top: auto;
     }
+
     .btn-group {
       display: flex;
       justify-content: space-between;
@@ -52,6 +70,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <header class="text-center">
@@ -59,11 +78,11 @@
       <div>
         <h1>💬 Comment Editor</h1>
         <br>
-        <p>Post ID {{post.post_id}} — {{ post.post_title }}</p>
+        <p>{{ event.event_id }} : {{ event.claim }}</p>
       </div>
       <div class="mt-3 mt-md-0">
-        <a href="{% url 'postcomments' post.post_id %}" class="btn btn-light btn-sm text-primary fw-semibold shadow-sm">
-          ⬅️ Back to Post View
+        <a href="{% url 'eventposts' event.event_id %}" class="btn btn-light btn-sm text-primary fw-semibold shadow-sm">
+          ⬅️ Back to Event Hub
         </a>
       </div>
     </div>
@@ -72,53 +91,45 @@
   <div class="container my-2">
     <div class="editor-card">
       {% if current_comment %}
-        <h3 class="mb-4">Comment ID: {{ current_comment.comment_id }}</h3>
+      <h3 class="mb-4">Comment {{ comment_index|add:1 }} of {{ comments|length }}</h3>
 
-        <!-- Section: Comment Info -->
+      <!-- Comment Info -->
+      <div class="mb-3">
+        <strong>Comment Text:</strong>
+        <p class="border rounded p-3 bg-light">{{ current_comment.comment_text }}</p>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+
         <div class="mb-3">
-          <label class="fw-semibold">Comment Text:</label>
-          <div class="p-2 bg-light rounded border">{{ current_comment.comment_text }}</div>
+          <label for="comment_label" class="form-label">Select Label ({{ annotator|capfirst }}):</label>
+          <select class="form-select" id="comment_label" name="comment_label" required>
+            <option value="">Choose a label</option>
+            <option value="0" {% if selected_label == "0" %}selected{% endif %}>Fake</option>
+            <option value="1" {% if selected_label == "1" %}selected{% endif %}>Real</option>
+          </select>
         </div>
 
-        <div class="mb-3">
-          <label class="fw-semibold">Student Label:</label>
-          <div>{{ current_comment.comment_label }}</div>
+        <div class="btn-group">
+          {% if comment_index > 0 %}
+          <a href="{% url 'comment_editor' post.post_id event.event_id comment_index|add:"-1" %}" class="btn btn-secondary">⬅️ Previous</a>
+          {% else %}
+          <button class="btn btn-secondary" disabled>⬅️ Previous</button>
+          {% endif %}
+
+          <button type="submit" class="btn btn-primary">💾 Save Label</button>
+
+          {% if comment_index < comments|length|add:"-1" %}
+          <a href="{% url 'comment_editor' post.post_id event.event_id comment_index|add:"1" %}" class="btn btn-secondary">Next ➡️</a>
+          {% else %}
+          <button class="btn btn-secondary" disabled>Next ➡️</button>
+          {% endif %}
         </div>
-        <hr>
-
-        <!-- Label selection -->
-        <form method="POST" class="container my-2">
-          {% csrf_token %}
-          <input type="hidden" name="comment_index" value="{{ comment_index }}">
-
-          <div class="mb-3">
-            <label for="comment_label" class="form-label">Select Label:</label>
-            <select class="form-select" id="comment_label" name="comment_label" required>
-              <option value="">Choose a label</option>
-              <option value="0" {% if selected_label|default:"" == "0" %}selected{% endif %}>Fake</option>
-              <option value="1" {% if selected_label|default:"" == "1" %}selected{% endif %}>Real</option>
-            </select>
-          </div>
-
-          <div class="btn-group">
-            {% if comment_index > 0 %}
-              <a href="?index={{ comment_index|add:-1 }}" class="btn btn-secondary">⬅️ Previous</a>
-            {% else %}
-              <button class="btn btn-secondary" disabled>⬅️ Previous</button>
-            {% endif %}
-
-            <button type="submit" class="btn btn-primary">💾 Save Label</button>
-
-            {% if comment_index < comments|length|add:"-1" %}
-              <a href="?index={{ comment_index|add:1 }}" class="btn btn-secondary">Next ➡️</a>
-            {% else %}
-              <button class="btn btn-secondary" disabled>Next ➡️</button>
-            {% endif %}
-          </div>
-        </form>
+      </form>
 
       {% else %}
-        <p class="text-center text-muted">No comments available for editing.</p>
+      <p class="text-center text-muted">No comment available for this index.</p>
       {% endif %}
     </div>
   </div>
@@ -129,4 +140,5 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

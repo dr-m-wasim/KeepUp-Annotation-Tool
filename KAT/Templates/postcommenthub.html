@@ -44,17 +44,27 @@
 <header>
     <h1>💬 Post Comment Hub</h1>
     <p>Comments related to Post ID: {{ post_id }}</p>
+    <p><strong>Event ID:</strong> {{ event_id }}</p>
+    <p><strong>Claim:</strong> {{ event.claim }}</p> <!-- Display claim from the event -->
+
 </header>
 
 <div class="container my-5">
     <div class="container text-center my-3">
-        {% url 'comment_editor' post_id=post.post_id as comment_url %}
-        <a href="{{ comment_url }}" class="btn btn-primary">Open Comment Editor</a>
-    </div>
+    {% if comments %}
+        <!-- Generate the URL with post_id, event_id, and the first comment's ID -->
+        <a href="{% url 'comment_editor' post_id=post_id event_id=event_id comment_index=comments.0.comment_id %}" class="btn btn-primary">
+            Open Comment Editor
+        </a>
+    {% else %}
+        <p>No comments available to edit.</p>
+    {% endif %}
+</div>
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered align-middle">
             <thead>
                 <tr>
+                    <th>Comment ID</th>
                     <th>Commenter Name</th>
                     <th>Comment Text</th>
                     <th>Likes</th>
@@ -73,6 +83,7 @@
             <tbody>
                 {% for comment in comments %}
                 <tr>
+                    <td>{{ comment.comment_id }}</td>
                     <td>{{ comment.commenter_name }}</td>
                     <td>{{ comment.commenttext }}</td>
                     <td>{{ comment.likescount_on_comment }}</td>

@@ -90,13 +90,16 @@ def post_editor(request, event_id):
     })
 
 
-def post_comments_view(request, post_id):
+def post_comments_view(request, post_id, event_id):
+    event = get_object_or_404(Events, event_id=event_id)
     comments = Comments.objects.filter(post_id=post_id)
     context = {
+        'event': event,
         'post_id': post_id,
+        'event_id': event_id,  # Pass event_id to the context
         'comments': comments,
     }
-    return render(request, 'postcommenthub.html', context)\
+    return render(request, 'postcommenthub.html', context)
     
 def save_comment(request, post_id):
     if request.method == 'POST':
@@ -125,39 +128,52 @@ def save_comment(request, post_id):
     return HttpResponseBadRequest("Invalid request method.")
 
 
-def comment_editor(request, post_id):
-    # Get the post object
+def comment_editor(request, post_id, event_id, comment_index):
     post = get_object_or_404(PostFeatures, post_id=post_id)
-    event = post.event  # Fetch associated event from the post
+    event = get_object_or_404(Events, event_id=event_id)
+    comments = list(Comments.objects.filter(post_id=post_id))
 
-    # Fetch all comments related to the post
-    comments = Comments.objects.filter(post_id=post_id).order_by('comment_id')
-    comment_index = int(request.GET.get('index', 0))
+    annotator = request.session.get('annotator', None)
+    if not annotator:
+        return redirect('annotator_select')
 
-    # Bounds checking
     if comment_index < 0:
         comment_index = 0
-    if comment_index >= comments.count():
-        comment_index = comments.count() - 1
+    if comment_index >= len(comments):
+        comment_index = len(comments) - 1
 
-    current_comment = comments[comment_index] if comments else None
+    current_comment = comments[comment_index]
 
-    # Handle label submission
-    if request.method == 'POST' and current_comment:
+    selected_label = ""
+    if annotator == 'annotatorone':
+        selected_label = current_comment.annotatorOne_comment_label
+    elif annotator == 'annotatortwo':
+        selected_label = current_comment.annotatorTwo_comment_label
+    elif annotator == 'annotatorthree':
+        selected_label = current_comment.annotatorThree_comment_label
+
+    if request.method == 'POST':
         selected_label = request.POST.get('comment_label')
-        if selected_label in ['0', '1']:
-            current_comment.annotatorOne_comment_label = selected_label
+        if selected_label:
+            if annotator == 'annotatorone':
+                current_comment.annotatorOne_comment_label = selected_label
+            elif annotator == 'annotatortwo':
+                current_comment.annotatorTwo_comment_label = selected_label
+            elif annotator == 'annotatorthree':
+                current_comment.annotatorThree_comment_label = selected_label
             current_comment.save()
-        return redirect(f"{request.path}?index={comment_index}")
 
-    # Context dictionary
-    context = {
-        'event': event,
+        next_index = comment_index + 1
+        if next_index >= len(comments):
+            next_index = comment_index
+        return redirect('comment_editor', post_id=post_id, event_id=event_id, comment_index=next_index)
+
+    return render(request, 'comment_editor.html', {
         'post': post,
+        'event': event,
         'comments': comments,
         'current_comment': current_comment,
         'comment_index': comment_index,
-        'selected_label': current_comment.annotatorOne_comment_label if current_comment else '',
-    }
-
-    return render(request, 'comment_editor.html', context)
+        'selected_label': selected_label,
+        'annotator': annotator,
+    })
