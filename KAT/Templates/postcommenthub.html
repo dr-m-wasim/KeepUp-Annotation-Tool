@@ -48,9 +48,8 @@
 
 <div class="container my-5">
     <div class="container text-center my-3">
-        <a href="{% url 'save_comment' post_id=post_id %}" class="btn btn-primary">
-            Open Comment Editor
-        </a>
+        {% url 'comment_editor' post_id=post.post_id as comment_url %}
+        <a href="{{ comment_url }}" class="btn btn-primary">Open Comment Editor</a>
     </div>
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered align-middle">

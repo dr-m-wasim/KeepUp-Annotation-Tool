@@ -123,3 +123,41 @@ def save_comment(request, post_id):
         return redirect('postcomments', post_id=post_id)
 
     return HttpResponseBadRequest("Invalid request method.")
+
+
+def comment_editor(request, post_id):
+    # Get the post object
+    post = get_object_or_404(PostFeatures, post_id=post_id)
+    event = post.event  # Fetch associated event from the post
+
+    # Fetch all comments related to the post
+    comments = Comments.objects.filter(post_id=post_id).order_by('comment_id')
+    comment_index = int(request.GET.get('index', 0))
+
+    # Bounds checking
+    if comment_index < 0:
+        comment_index = 0
+    if comment_index >= comments.count():
+        comment_index = comments.count() - 1
+
+    current_comment = comments[comment_index] if comments else None
+
+    # Handle label submission
+    if request.method == 'POST' and current_comment:
+        selected_label = request.POST.get('comment_label')
+        if selected_label in ['0', '1']:
+            current_comment.annotatorOne_comment_label = selected_label
+            current_comment.save()
+        return redirect(f"{request.path}?index={comment_index}")
+
+    # Context dictionary
+    context = {
+        'event': event,
+        'post': post,
+        'comments': comments,
+        'current_comment': current_comment,
+        'comment_index': comment_index,
+        'selected_label': current_comment.annotatorOne_comment_label if current_comment else '',
+    }
+
+    return render(request, 'comment_editor.html', context)
