@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Comment Editor - KAT by @satoshi</title>
+  <title>Post Editor - KAT by @satoshi</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -89,9 +90,9 @@
   <header class="text-center">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
       <div>
-        <h1>💬 Comment Editor</h1>
+        <h1>📝 Post Editor</h1>
         <br>
-        <p>{{ event.event_id }} : {{ event.claim }}</p>
+        <p>{{event.event_id}} : {{ event.claim }}</p>
       </div>
       <div class="mt-3 mt-md-0">
         <a href="{% url 'eventposts' event.event_id %}" class="btn btn-light btn-sm text-primary fw-semibold shadow-sm">
@@ -100,49 +101,62 @@
       </div>
     </div>
   </header>
-
-  <div class="container my-4">
+  
+  <div class="container my-2">
     <div class="editor-card">
-      {% if current_comment %}
-      <h3 class="mb-3">Comment ID: {{ current_comment.comment_id }}</h3>
-
-      <p><strong>Comment Text:</strong></p>
-      <p class="mb-3">{{ current_comment.comment_text }}</p>
-
-      <hr>
-
-      <form method="POST">
-        {% csrf_token %}
-        <div class="mb-3">
-          <label for="comment_label" class="form-label">Select Label:</label>
-          <select class="form-select" id="comment_label" name="comment_label" required>
-            <option value="">Choose a label</option>
-            <option value="0" {% if selected_label == "0" %}selected{% endif %}>Fake</option>
-            <option value="1" {% if selected_label == "1" %}selected{% endif %}>Real</option>
-          </select>
+        {% if current_post %}
+        <h3 class="mb-4">Post ID: {{ current_post.post_id }}</h3>
+      
+        <!-- Section: Post Info -->
+        <div class="row mb-3">
+          <div class="col-md-4 fw-semibold">Post Title:</div>
+          <div class="col-md-8">{{ current_post.post_title }}</div>
+      
+          <div class="col-md-4 fw-semibold">URL:</div>
+          <div class="col-md-8"><a href="{{ current_post.post_url }}" target="_blank">View Post</a></div>
         </div>
-
-        <div class="btn-group">
-          {% if comment_index > 0 %}
-          <a href="{% url 'comment_editor' post.post_id event.event_id comments|index:comment_index|add:'-1' %}" class="btn btn-secondary">⬅️ Previous</a>
-          {% else %}
-          <button class="btn btn-secondary" disabled>⬅️ Previous</button>
-          {% endif %}
-
-          <button type="submit" class="btn btn-primary">💾 Save Label</button>
-
-          {% if comment_index < comments|length|add:"-1" %}
-          <a href="{% url 'comment_editor' post.post_id event.event_id comments|index:comment_index|add:'1' %}" class="btn btn-secondary">Next ➡️</a>
-          {% else %}
-          <button class="btn btn-secondary" disabled>Next ➡️</button>
-          {% endif %}
+        <hr>
+      
+        <div class="col-md-4 fw-semibold">Student Label : {{ current_post.post_label }}</div>
         </div>
-      </form>
+        <hr>
+      
+        <!-- Label selection -->
+        <form method="POST" class="container my-2">
+          {% csrf_token %}
+          <input type="hidden" name="post_index" value="{{ post_index }}">
 
-      {% else %}
-      <p class="text-center text-muted">No comment found or invalid comment ID.</p>
-      {% endif %}
-    </div>
+          <div class="mb-3">
+            <label for="post_label" class="form-label">Select Label:</label>
+            <select class="form-select" id="post_label" name="post_label" required>
+              <option value="">Choose a label</option>
+              <option value="0" {% if selected_label|default:"" == "0" %}selected{% endif %}>Fake</option>
+              <option value="1" {% if selected_label|default:"" == "1" %}selected{% endif %}>Real</option>
+            </select>
+          </div>
+
+          <div class="btn-group">
+            {% if post_index > 0 %}
+            <a href="?index={{ post_index|add:-1 }}" class="btn btn-secondary">⬅️ Previous</a>
+            {% else %}
+            <button class="btn btn-secondary" disabled>⬅️ Previous</button>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">💾 Save Label</button>
+
+            {% if post_index < posts|length|add:"-1" %}
+            <a href="?index={{ post_index|add:1 }}" class="btn btn-secondary">Next ➡️</a>
+            {% else %}
+            <button class="btn btn-secondary" disabled>Next ➡️</button>
+            {% endif %}
+          </div>
+        </form>
+      
+        {% else %}
+        <p class="text-center text-muted">No posts available for editing.</p>
+        {% endif %}
+      </div>
+      
   </div>
 
   <footer>
@@ -151,4 +165,5 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
