@@ -114,9 +114,20 @@
         </div>
 
         <h3 class="text-center mb-4">📄 Posts Related to Event</h3>
-        <div class="text-center mb-3">
-            <a href="{% url 'post_editor' event.event_id %}" class="btn btn-primary">Open Post Editor</a>
-        </div>
+          
+        <div class="d-flex justify-content-between align-items-center mb-3 px-3">
+            <a href="{% url 'events' %}" 
+               class="btn btn-light btn-sm text-primary fw-semibold shadow-sm flex-fill me-2 text-center" 
+               style="max-width: 200px; height: 40px; line-height: 26px;">
+              ⬅️ Back to Events
+            </a>
+            
+            <a href="{% url 'post_editor' event.event_id %}" 
+               class="btn btn-primary btn-sm flex-fill ms-2 text-center" 
+               style="max-width: 200px; height: 40px; line-height: 26px;">
+              Open Post Editor
+            </a>
+          </div>          
 
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered align-middle">
