@@ -125,6 +125,7 @@
                         <th>Post ID</th>
                         <th>Post Title</th>
                         <th>Post URL</th>
+                        <th>Post Comments</th>
                         <th>Platform</th>
                         <th>Likes</th>
                         <th>Views</th>
@@ -143,12 +144,20 @@
                 </thead>
                 <tbody>
                     {% for post in posts %}
-                    <tr onclick="window.location.href='{% url 'postcomments' post.post_id event.event_id %}'" style="cursor: pointer;">                        <td>{{ post.post_id }}</td>
+                    <tr>
+                        <td>{{ post.post_id }}</td>
                         <td>{{ post.post_title }}</td>
                         <td>
                             <a href="{{ post.post_url }}" target="_blank" class="btn btn-sm btn-outline-primary">View
                                 Post</a>
                         </td>
+                        <td class="text-center">
+                            <a href="{% url 'postcomments' post.post_id event.event_id %}" 
+                               class="btn btn-sm btn-outline-primary" 
+                               style="cursor: pointer;">
+                               Comments
+                            </a>
+                        </td>                        
                         <td>{{ post.platform }}</td>
                         <td>{{ post.likescount }}</td>
                         <td>{{ post.views }}</td>
