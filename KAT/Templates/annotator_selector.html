@@ -149,6 +149,28 @@
         </div>
     </div>
     
+    <!-- Export Buttons -->
+<div class="d-flex justify-content-around my-4">
+    <form method="post" action="{% url 'export_events_csv' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Export Events CSV</button>
+    </form>
+
+    <form method="post" action="{% url 'export_posts_csv' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">Export Posts CSV</button>
+    </form>
+
+    <form method="post" action="{% url 'export_user_features_csv' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-info">Export User Features CSV</button>
+    </form>
+
+    <form method="post" action="{% url 'export_comments_csv' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Export Comments CSV</button>
+    </form>
+</div>
 
 
     <!-- Footer -->

@@ -1,8 +1,148 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Events, PostFeatures, Comments
+from .models import Events, PostFeatures, Comments, UserFeatures
 from django.urls import reverse
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponse
 from django.db import models
+import csv
+
+def export_posts_csv(request):
+    posts = PostFeatures.objects.all()
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="post_features.csv"'
+    response.write('\ufeff')
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Event ID', 'Post ID', 'Post URL', 'Platform', 'Post Title', 'Post Label',
+        'Media Type (0-img,1-vid,2)', 'Likes Count', 'Timestamp', 'Comments Count',
+        'Views', 'Shares', 'Reposts',
+        'Annotator 1 Post Label', 'Annotator 2 Post Label', 'Annotator 3 Post Label'
+    ])
+
+    for post in posts:
+        writer.writerow([
+            post.event_id,
+            post.post_id,
+            post.post_url,
+            post.platform,
+            post.post_title,
+            post.post_label,
+            post.image_image_0_video_1_if_no_image_video_2_field,
+            post.likescount,
+            post.timestamp,
+            post.commentscount,
+            post.views,
+            post.shares,
+            post.reposts,
+            post.annotatorOne_post_label,
+            post.annotatorTwo_post_label,
+            post.annotatorThree_post_label
+        ])
+    return response
+
+def export_events_csv(request):
+    events = Events.objects.all()
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="events.csv"'
+    response.write('\ufeff')  # UTF-8 BOM for Excel support
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Student ID', 'Student Name', 'Event ID', 'Event Name', 'Claim', 'Claim URL',
+        'Post URL', 'Label', 'Unnamed: 8', 'Unnamed: 9', 'Unnamed: 10',
+        'Unnamed: 11', 'Unnamed: 12', 'Unnamed: 13'
+    ])
+
+    for event in events:
+        writer.writerow([
+            event.student_id,
+            event.student_name,
+            event.event_id,
+            event.event_name,
+            event.claim,
+            event.claim_url,
+            event.posturl,
+            event.label,
+            event.unnamed_8,
+            event.unnamed_9,
+            event.unnamed_10,
+            event.unnamed_11,
+            event.unnamed_12,
+            event.unnamed_13
+        ])
+    return response
+
+
+def export_user_features_csv(request):
+    user_features = UserFeatures.objects.all()
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="user_features.csv"'
+    response.write('\ufeff')
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Post ID', 'Username', 'Followers', 'Followings', 'User Verified (0/1)',
+        'Profile Pic URL', 'Posts Count', 'Joining Date'
+    ])
+
+    for user in user_features:
+        writer.writerow([
+            user.post_id,
+            user.username,
+            user.followers,
+            user.followings,
+            user.is_user_verified_0_verified_1_unverified_field,
+            user.profile_pic_url,
+            user.posts_count,
+            user.joining_date
+        ])
+    return response
+
+
+def export_comments_csv(request):
+    comments = Comments.objects.all()
+
+    # Use UTF-8 with BOM to support Urdu and other Unicode text
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="comments.csv"'
+    response.write('\ufeff')  # Write BOM at beginning
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Comment ID', 'Post ID', 'Comment Text', 'Commenter Name',
+        'Likes Count', 'Comment Label', 'Annotator 1 Label',
+        'Annotator 2 Label', 'Annotator 3 Label', 'Label'
+    ])
+
+    for comment in comments:
+        label1 = comment.annotatorOne_comment_label
+        label2 = comment.annotatorTwo_comment_label
+        label3 = comment.annotatorThree_comment_label
+
+        if label1 == label2 and label1:
+            final_label = label1
+        elif label1 == label3 and label1:
+            final_label = label1
+        elif label2 == label3 and label2:
+            final_label = label2
+        else:
+            final_label = ''
+
+        writer.writerow([
+            comment.comment_id,
+            comment.post_id,
+            comment.commenttext,
+            comment.commenter_name,
+            comment.likescount_on_comment,
+            comment.comment_label,
+            label1,
+            label2,
+            label3,
+            final_label
+        ])
+
+    return response
+
 
 
 def annotator_select(request):
