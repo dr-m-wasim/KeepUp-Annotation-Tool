@@ -217,16 +217,16 @@ def annotator_select(request):
 
     # Posts labeled per annotator
     post_counts = {
-        'annotatorOne': PostFeatures.objects.exclude(annotatorOne_post_label__isnull=True).exclude(annotatorOne_post_label='').count(),
-        'annotatorTwo': PostFeatures.objects.exclude(annotatorTwo_post_label__isnull=True).exclude(annotatorTwo_post_label='').count(),
-        'annotatorThree': PostFeatures.objects.exclude(annotatorThree_post_label__isnull=True).exclude(annotatorThree_post_label='').count(),
+        'annotatorOne': PostFeatures.objects.exclude(annotatorOne_post_label__isnull=True).exclude(annotatorOne_post_label='').exclude(annotatorOne_post_label='None').count(),
+        'annotatorTwo': PostFeatures.objects.exclude(annotatorTwo_post_label__isnull=True).exclude(annotatorTwo_post_label='').exclude(annotatorOne_post_label='None').count(),
+        'annotatorThree': PostFeatures.objects.exclude(annotatorThree_post_label__isnull=True).exclude(annotatorThree_post_label='').exclude(annotatorOne_post_label='None').count(),
     }
 
     # Comments labeled per annotator
     comment_counts = {
-        'annotatorOne': Comments.objects.exclude(annotatorOne_comment_label__isnull=True).exclude(annotatorOne_comment_label='').count(),
-        'annotatorTwo': Comments.objects.exclude(annotatorTwo_comment_label__isnull=True).exclude(annotatorTwo_comment_label='').count(),
-        'annotatorThree': Comments.objects.exclude(annotatorThree_comment_label__isnull=True).exclude(annotatorThree_comment_label='').count(),
+        'annotatorOne': Comments.objects.exclude(annotatorOne_comment_label__isnull=True).exclude(annotatorOne_comment_label='').exclude(annotatorTwo_comment_label='None').count(),
+        'annotatorTwo': Comments.objects.exclude(annotatorTwo_comment_label__isnull=True).exclude(annotatorTwo_comment_label='').exclude(annotatorTwo_comment_label='None').count(),
+        'annotatorThree': Comments.objects.exclude(annotatorThree_comment_label__isnull=True).exclude(annotatorThree_comment_label='').exclude(annotatorTwo_comment_label='None').count(),
     }
 
     # Calculate percentages
