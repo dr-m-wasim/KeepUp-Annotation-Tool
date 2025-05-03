@@ -74,18 +74,21 @@
 <body>
 
   <header class="text-center">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-      <div>
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+      <div class="mb-3 mb-md-0">
         <h1>💬 Comment Editor</h1>
         <br>
         <p>{{ event.event_id }} : {{ event.claim }}</p>
       </div>
-      <div class="mt-3 mt-md-0">
-        <a href="{% url 'postcomments' post.post_id event.event_id %}" class="btn btn-light btn-sm text-primary fw-semibold shadow-sm">
+    
+      <div class="mt-2 mt-md-0 text-md-end">
+        <a href="{% url 'postcomments' post.post_id event.event_id %}" 
+           class="btn btn-light btn-sm text-primary fw-semibold shadow-sm"
+           style="min-width: 180px; height: 40px; line-height: 26px;">
           ⬅️ Back to Comment Hub
         </a>
       </div>
-    </div>
+    </div>        
   </header>
 
   <div class="container my-2">
