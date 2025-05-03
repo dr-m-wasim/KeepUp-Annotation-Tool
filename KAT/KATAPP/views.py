@@ -5,10 +5,51 @@ from django.http import HttpResponseBadRequest, HttpResponse
 from django.db import models
 import csv
 from django.http import JsonResponse
-from sklearn.metrics import cohen_kappa_score
-from statsmodels.stats.inter_rater import fleiss_kappa
 from collections import Counter
 from django.db.models import Q
+
+def compute_fleiss_kappa(matrix):
+    n = sum(matrix[0])  # Number of raters per item
+    N = len(matrix)     # Number of items
+    k = len(matrix[0])  # Number of categories
+
+    # Proportion of ratings in each category
+    pj = [sum(row[j] for row in matrix) / (N * n) for j in range(k)]
+
+    # Agreement for each item
+    Pi = []
+    for row in matrix:
+        row_sum = sum(row)
+        agreement = sum([count * (count - 1) for count in row])
+        Pi.append(agreement / (row_sum * (row_sum - 1)))
+
+    P_bar = sum(Pi) / N
+    P_e_bar = sum([p**2 for p in pj])
+
+    if P_e_bar == 1:
+        return 1.0
+    return (P_bar - P_e_bar) / (1 - P_e_bar)
+
+def compute_cohen_kappa(labels1, labels2):
+    assert len(labels1) == len(labels2), "Label lists must be same length"
+
+    total = len(labels1)
+    labels = set(labels1) | set(labels2)
+    
+    # Count label agreements and distributions
+    observed_agreement = sum([1 for a, b in zip(labels1, labels2) if a == b]) / total
+
+    label_counts_1 = Counter(labels1)
+    label_counts_2 = Counter(labels2)
+
+    expected_agreement = sum(
+        (label_counts_1[label] / total) * (label_counts_2[label] / total)
+        for label in labels
+    )
+
+    if expected_agreement == 1:
+        return 1.0  # Avoid division by zero
+    return (observed_agreement - expected_agreement) / (1 - expected_agreement)
 
 def calculate_kappa_scores(request):
     comments = Comments.objects.filter(
@@ -17,47 +58,47 @@ def calculate_kappa_scores(request):
         ~Q(annotatorThree_comment_label=None)
     )
 
-    annotator1_labels = []
-    annotator2_labels = []
-    annotator3_labels = []
+    annotator1 = []
+    annotator2 = []
+    annotator3 = []
 
-    # Collect all unique labels (categories)
-    all_labels = set()
-    for c in comments:
-        all_labels.update([
-            c.annotatorOne_comment_label,
-            c.annotatorTwo_comment_label,
-            c.annotatorThree_comment_label,
-        ])
-    all_labels = sorted(list(all_labels))  # e.g., ["agree", "disagree", "comment", "query"]
-    label_index = {label: idx for idx, label in enumerate(all_labels)}
-
-    # Build the matrix for Fleiss' Kappa
+    label_set = set()
     matrix = []
+
+    for c in comments:
+        l1 = c.annotatorOne_comment_label
+        l2 = c.annotatorTwo_comment_label
+        l3 = c.annotatorThree_comment_label
+
+        labels = [l1, l2, l3]
+        annotator1.append(l1)
+        annotator2.append(l2)
+        annotator3.append(l3)
+
+        label_set.update(labels)
+    
+    label_list = sorted(label_set)
+    label_index = {label: idx for idx, label in enumerate(label_list)}
+
     for c in comments:
         labels = [c.annotatorOne_comment_label, c.annotatorTwo_comment_label, c.annotatorThree_comment_label]
-        count = Counter(labels)
-        row = [count.get(label, 0) for label in all_labels]
+        row = [0] * len(label_list)
+        for label in labels:
+            row[label_index[label]] += 1
         matrix.append(row)
 
-    fleiss = fleiss_kappa(matrix)
-
-    # Also calculate Cohen's Kappa scores
-    for c in comments:
-        annotator1_labels.append(c.annotatorOne_comment_label)
-        annotator2_labels.append(c.annotatorTwo_comment_label)
-        annotator3_labels.append(c.annotatorThree_comment_label)
-
-    kappa_1_vs_2 = cohen_kappa_score(annotator1_labels, annotator2_labels)
-    kappa_1_vs_3 = cohen_kappa_score(annotator1_labels, annotator3_labels)
-    kappa_2_vs_3 = cohen_kappa_score(annotator2_labels, annotator3_labels)
+    fleiss = compute_fleiss_kappa(matrix)
+    kappa_1_2 = compute_cohen_kappa(annotator1, annotator2)
+    kappa_1_3 = compute_cohen_kappa(annotator1, annotator3)
+    kappa_2_3 = compute_cohen_kappa(annotator2, annotator3)
 
     return JsonResponse({
-        'kappa_annotator1_vs_annotator2': round(kappa_1_vs_2, 4),
-        'kappa_annotator1_vs_annotator3': round(kappa_1_vs_3, 4),
-        'kappa_annotator2_vs_annotator3': round(kappa_2_vs_3, 4),
+        'kappa_annotator1_vs_annotator2': round(kappa_1_2, 4),
+        'kappa_annotator1_vs_annotator3': round(kappa_1_3, 4),
+        'kappa_annotator2_vs_annotator3': round(kappa_2_3, 4),
         'fleiss_kappa': round(fleiss, 4),
     })
+
 
 
 def export_posts_csv(request):
@@ -217,16 +258,16 @@ def annotator_select(request):
 
     # Posts labeled per annotator
     post_counts = {
-        'annotatorOne': PostFeatures.objects.exclude(annotatorOne_post_label__isnull=True).exclude(annotatorOne_post_label='').count(),
-        'annotatorTwo': PostFeatures.objects.exclude(annotatorTwo_post_label__isnull=True).exclude(annotatorTwo_post_label='').count(),
-        'annotatorThree': PostFeatures.objects.exclude(annotatorThree_post_label__isnull=True).exclude(annotatorThree_post_label='').count(),
+        'annotatorOne': PostFeatures.objects.exclude(annotatorOne_post_label__isnull=True).exclude(annotatorOne_post_label='').exclude(annotatorOne_post_label='None').count(),
+        'annotatorTwo': PostFeatures.objects.exclude(annotatorTwo_post_label__isnull=True).exclude(annotatorTwo_post_label='').exclude(annotatorOne_post_label='None').count(),
+        'annotatorThree': PostFeatures.objects.exclude(annotatorThree_post_label__isnull=True).exclude(annotatorThree_post_label='').exclude(annotatorOne_post_label='None').count(),
     }
 
     # Comments labeled per annotator
     comment_counts = {
-        'annotatorOne': Comments.objects.exclude(annotatorOne_comment_label__isnull=True).exclude(annotatorOne_comment_label='').count(),
-        'annotatorTwo': Comments.objects.exclude(annotatorTwo_comment_label__isnull=True).exclude(annotatorTwo_comment_label='').count(),
-        'annotatorThree': Comments.objects.exclude(annotatorThree_comment_label__isnull=True).exclude(annotatorThree_comment_label='').count(),
+        'annotatorOne': Comments.objects.exclude(annotatorOne_comment_label__isnull=True).exclude(annotatorOne_comment_label='').exclude(annotatorTwo_comment_label='None').count(),
+        'annotatorTwo': Comments.objects.exclude(annotatorTwo_comment_label__isnull=True).exclude(annotatorTwo_comment_label='').exclude(annotatorTwo_comment_label='None').count(),
+        'annotatorThree': Comments.objects.exclude(annotatorThree_comment_label__isnull=True).exclude(annotatorThree_comment_label='').exclude(annotatorTwo_comment_label='None').count(),
     }
 
     # Calculate percentages
