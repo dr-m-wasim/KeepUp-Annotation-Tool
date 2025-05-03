@@ -51,8 +51,14 @@
 
 <div class="container my-5">
     <div class="container text-center my-3">
+
+        <a href="{% url 'eventposts' event_id %}" 
+            class="btn btn-light btn-sm text-primary fw-semibold shadow-sm flex-fill me-2 text-center" 
+            style="max-width: 200px; height: 40px; line-height: 26px;">
+            ⬅️ Back to Posts
+        </a>
+
     {% if comments %}
-        <!-- Generate the URL with post_id, event_id, and the first comment's ID -->
         <a href="{% url 'comment_editor' post_id=post_id event_id=event_id comment_index=0 %}" class="btn btn-primary">
             Open Comment Editor
         </a>
