@@ -185,6 +185,7 @@
             <p><strong>Annotator 1 vs Annotator 2:</strong> <span id="kappa_1_vs_2">-</span></p>
             <p><strong>Annotator 1 vs Annotator 3:</strong> <span id="kappa_1_vs_3">-</span></p>
             <p><strong>Annotator 2 vs Annotator 3:</strong> <span id="kappa_2_vs_3">-</span></p>
+            <p><strong>Fleiss' Kappa (3 Annotators):</strong> <span id="fleiss_kappa">-</span></p>
         </div>
     </div>
 </div>
@@ -210,12 +211,14 @@
                         $('#kappa_1_vs_2').text(data.kappa_annotator1_vs_annotator2);
                         $('#kappa_1_vs_3').text(data.kappa_annotator1_vs_annotator3);
                         $('#kappa_2_vs_3').text(data.kappa_annotator2_vs_annotator3);
+                        $('#fleiss_kappa').text(data.fleiss_kappa);
                     },
                     error: function(error) {
                         $('#kappaResults').show();
                         $('#kappa_1_vs_2').text('Error calculating score');
                         $('#kappa_1_vs_3').text('Error calculating score');
                         $('#kappa_2_vs_3').text('Error calculating score');
+                        $('#fleiss_kappa').text('Error calculating score');
                     }
                 });
             });

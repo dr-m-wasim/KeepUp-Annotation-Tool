@@ -6,32 +6,57 @@ from django.db import models
 import csv
 from django.http import JsonResponse
 from sklearn.metrics import cohen_kappa_score
-
+from statsmodels.stats.inter_rater import fleiss_kappa
+from collections import Counter
+from django.db.models import Q
 
 def calculate_kappa_scores(request):
-    comments = Comments.objects.all()
+    comments = Comments.objects.filter(
+        ~Q(annotatorOne_comment_label=None),
+        ~Q(annotatorTwo_comment_label=None),
+        ~Q(annotatorThree_comment_label=None)
+    )
 
     annotator1_labels = []
     annotator2_labels = []
     annotator3_labels = []
 
-    for comment in comments:
-        if comment.annotatorOne_comment_label and comment.annotatorTwo_comment_label:
-            annotator1_labels.append(comment.annotatorOne_comment_label)
-            annotator2_labels.append(comment.annotatorTwo_comment_label)
+    # Collect all unique labels (categories)
+    all_labels = set()
+    for c in comments:
+        all_labels.update([
+            c.annotatorOne_comment_label,
+            c.annotatorTwo_comment_label,
+            c.annotatorThree_comment_label,
+        ])
+    all_labels = sorted(list(all_labels))  # e.g., ["agree", "disagree", "comment", "query"]
+    label_index = {label: idx for idx, label in enumerate(all_labels)}
 
-        if comment.annotatorOne_comment_label and comment.annotatorThree_comment_label:
-            annotator3_labels.append(comment.annotatorThree_comment_label)
+    # Build the matrix for Fleiss' Kappa
+    matrix = []
+    for c in comments:
+        labels = [c.annotatorOne_comment_label, c.annotatorTwo_comment_label, c.annotatorThree_comment_label]
+        count = Counter(labels)
+        row = [count.get(label, 0) for label in all_labels]
+        matrix.append(row)
 
-    # Calculate Kappa scores
-    kappa_1_vs_2 = cohen_kappa_score(annotator1_labels, annotator2_labels) if annotator1_labels and annotator2_labels else None
-    kappa_1_vs_3 = cohen_kappa_score(annotator1_labels, annotator3_labels) if annotator1_labels and annotator3_labels else None
-    kappa_2_vs_3 = cohen_kappa_score(annotator2_labels, annotator3_labels) if annotator2_labels and annotator3_labels else None
+    fleiss = fleiss_kappa(matrix)
+
+    # Also calculate Cohen's Kappa scores
+    for c in comments:
+        annotator1_labels.append(c.annotatorOne_comment_label)
+        annotator2_labels.append(c.annotatorTwo_comment_label)
+        annotator3_labels.append(c.annotatorThree_comment_label)
+
+    kappa_1_vs_2 = cohen_kappa_score(annotator1_labels, annotator2_labels)
+    kappa_1_vs_3 = cohen_kappa_score(annotator1_labels, annotator3_labels)
+    kappa_2_vs_3 = cohen_kappa_score(annotator2_labels, annotator3_labels)
 
     return JsonResponse({
-        'kappa_annotator1_vs_annotator2': round(kappa_1_vs_2, 4) if kappa_1_vs_2 is not None else "Insufficient data",
-        'kappa_annotator1_vs_annotator3': round(kappa_1_vs_3, 4) if kappa_1_vs_3 is not None else "Insufficient data",
-        'kappa_annotator2_vs_annotator3': round(kappa_2_vs_3, 4) if kappa_2_vs_3 is not None else "Insufficient data",
+        'kappa_annotator1_vs_annotator2': round(kappa_1_vs_2, 4),
+        'kappa_annotator1_vs_annotator3': round(kappa_1_vs_3, 4),
+        'kappa_annotator2_vs_annotator3': round(kappa_2_vs_3, 4),
+        'fleiss_kappa': round(fleiss, 4),
     })
 
 
