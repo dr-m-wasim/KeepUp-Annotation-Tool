@@ -81,7 +81,75 @@
                 <button type="submit" class="btn btn-primary w-100">Continue</button>
             </form>
         </div>
+
+        
     </main>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <h3 class="text-primary fw-bold">📝 Post Annotation Progress</h3>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Annotator One</label>
+                    <div class="progress rounded-pill" style="height: 20px;">
+                        <div class="progress-bar bg-info text-dark fw-bold" role="progressbar" style="width: {{ post_progress.annotatorOne }}%;" aria-valuenow="{{ post_progress.annotatorOne }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ post_progress.annotatorOne }}%
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Annotator Two</label>
+                    <div class="progress rounded-pill" style="height: 20px;">
+                        <div class="progress-bar bg-primary fw-bold" role="progressbar" style="width: {{ post_progress.annotatorTwo }}%;" aria-valuenow="{{ post_progress.annotatorTwo }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ post_progress.annotatorTwo }}%
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Annotator Three</label>
+                    <div class="progress rounded-pill" style="height: 20px;">
+                        <div class="progress-bar bg-secondary fw-bold" role="progressbar" style="width: {{ post_progress.annotatorThree }}%;" aria-valuenow="{{ post_progress.annotatorThree }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ post_progress.annotatorThree }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="col-md-6 mb-4">
+                <h3 class="text-success fw-bold">💬 Comment Annotation Progress</h3>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Annotator One</label>
+                    <div class="progress rounded-pill" style="height: 20px;">
+                        <div class="progress-bar bg-success fw-bold" role="progressbar" style="width: {{ comment_progress.annotatorOne }}%;" aria-valuenow="{{ comment_progress.annotatorOne }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ comment_progress.annotatorOne }}%
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Annotator Two</label>
+                    <div class="progress rounded-pill" style="height: 20px;">
+                        <div class="progress-bar bg-success fw-bold" style="width: {{ comment_progress.annotatorTwo }}%;" aria-valuenow="{{ comment_progress.annotatorTwo }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ comment_progress.annotatorTwo }}%
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Annotator Three</label>
+                    <div class="progress rounded-pill" style="height: 20px;">
+                        <div class="progress-bar bg-success fw-bold" style="width: {{ comment_progress.annotatorThree }}%;" aria-valuenow="{{ comment_progress.annotatorThree }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ comment_progress.annotatorThree }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
 
     <!-- Footer -->
     <footer>

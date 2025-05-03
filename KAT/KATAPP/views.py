@@ -4,13 +4,46 @@ from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.db import models
 
+
 def annotator_select(request):
     if request.method == 'POST':
         annotator = request.POST.get('annotator')
         if annotator:
-            request.session['annotator'] = annotator  # Save annotator in session
-            return redirect('events')  # Redirect to events page after selection
-    return render(request, 'annotator_selector.html')
+            request.session['annotator'] = annotator
+            return redirect('events')
+
+    # Total counts
+    total_posts = PostFeatures.objects.count()
+    total_comments = Comments.objects.count()
+
+    # Avoid division by zero
+    total_posts = total_posts if total_posts > 0 else 1
+    total_comments = total_comments if total_comments > 0 else 1
+
+    # Posts labeled per annotator
+    post_counts = {
+        'annotatorOne': PostFeatures.objects.exclude(annotatorOne_post_label__isnull=True).exclude(annotatorOne_post_label='').count(),
+        'annotatorTwo': PostFeatures.objects.exclude(annotatorTwo_post_label__isnull=True).exclude(annotatorTwo_post_label='').count(),
+        'annotatorThree': PostFeatures.objects.exclude(annotatorThree_post_label__isnull=True).exclude(annotatorThree_post_label='').count(),
+    }
+
+    # Comments labeled per annotator
+    comment_counts = {
+        'annotatorOne': Comments.objects.exclude(annotatorOne_comment_label__isnull=True).exclude(annotatorOne_comment_label='').count(),
+        'annotatorTwo': Comments.objects.exclude(annotatorTwo_comment_label__isnull=True).exclude(annotatorTwo_comment_label='').count(),
+        'annotatorThree': Comments.objects.exclude(annotatorThree_comment_label__isnull=True).exclude(annotatorThree_comment_label='').count(),
+    }
+
+    # Calculate percentages
+    post_progress = {k: round((v / total_posts) * 100, 2) for k, v in post_counts.items()}
+    comment_progress = {k: round((v / total_comments) * 100, 2) for k, v in comment_counts.items()}
+
+    context = {
+        'post_progress': post_progress,
+        'comment_progress': comment_progress,
+    }
+
+    return render(request, 'annotator_selector.html', context)
 
 def events_list(request):
     events = Events.objects.all()
