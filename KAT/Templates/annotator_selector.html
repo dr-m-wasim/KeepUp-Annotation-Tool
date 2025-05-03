@@ -173,12 +173,52 @@
 </div>
 
 
+                
+            <!-- Kappa Score Calculation Section -->
+            <div class="col-md-6 mb-4">
+                <h3 class="text-warning fw-bold">📊 Calculate Kappa Scores</h3>
+                <button id="calculateKappaButton" class="btn btn-success w-100 mb-3">Calculate Kappa Scores</button>
+                
+                <div id="kappaResults" class="result-box" style="display: none;">
+                    <h4>Kappa Score Results:</h4>
+                    <p><strong>Annotator 1 vs Annotator 2:</strong> <span id="kappa_1_vs_2">-</span></p>
+                    <p><strong>Annotator 1 vs Annotator 3:</strong> <span id="kappa_1_vs_3">-</span></p>
+                    <p><strong>Annotator 2 vs Annotator 3:</strong> <span id="kappa_2_vs_3">-</span></p>
+                </div>
+            </div>
+
+
     <!-- Footer -->
     <footer>
         <small>&copy; 2025 Annotation System. All rights reserved.</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#calculateKappaButton").click(function(){
+                $.ajax({
+                    url: '{% url "calculate_kappa_scores" %}',  // Using Django's URL template tag
+                    type: 'GET',
+                    success: function(data) {
+                        // Display the kappa scores in the result box
+                        $('#kappaResults').show();
+                        $('#kappa_1_vs_2').text(data.kappa_annotator1_vs_annotator2);
+                        $('#kappa_1_vs_3').text(data.kappa_annotator1_vs_annotator3);
+                        $('#kappa_2_vs_3').text(data.kappa_annotator2_vs_annotator3);
+                    },
+                    error: function(error) {
+                        $('#kappaResults').show();
+                        $('#kappa_1_vs_2').text('Error calculating score');
+                        $('#kappa_1_vs_3').text('Error calculating score');
+                        $('#kappa_2_vs_3').text('Error calculating score');
+                    }
+                });
+            });
+        });
+    </script>
+    
 </body>
 
 </html>

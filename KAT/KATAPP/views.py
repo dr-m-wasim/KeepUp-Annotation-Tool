@@ -4,6 +4,36 @@ from django.urls import reverse
 from django.http import HttpResponseBadRequest, HttpResponse
 from django.db import models
 import csv
+from django.http import JsonResponse
+from sklearn.metrics import cohen_kappa_score
+
+
+def calculate_kappa_scores(request):
+    comments = Comments.objects.all()
+
+    annotator1_labels = []
+    annotator2_labels = []
+    annotator3_labels = []
+
+    for comment in comments:
+        if comment.annotatorOne_comment_label and comment.annotatorTwo_comment_label:
+            annotator1_labels.append(comment.annotatorOne_comment_label)
+            annotator2_labels.append(comment.annotatorTwo_comment_label)
+
+        if comment.annotatorOne_comment_label and comment.annotatorThree_comment_label:
+            annotator3_labels.append(comment.annotatorThree_comment_label)
+
+    # Calculate Kappa scores
+    kappa_1_vs_2 = cohen_kappa_score(annotator1_labels, annotator2_labels) if annotator1_labels and annotator2_labels else None
+    kappa_1_vs_3 = cohen_kappa_score(annotator1_labels, annotator3_labels) if annotator1_labels and annotator3_labels else None
+    kappa_2_vs_3 = cohen_kappa_score(annotator2_labels, annotator3_labels) if annotator2_labels and annotator3_labels else None
+
+    return JsonResponse({
+        'kappa_annotator1_vs_annotator2': round(kappa_1_vs_2, 4) if kappa_1_vs_2 is not None else "Insufficient data",
+        'kappa_annotator1_vs_annotator3': round(kappa_1_vs_3, 4) if kappa_1_vs_3 is not None else "Insufficient data",
+        'kappa_annotator2_vs_annotator3': round(kappa_2_vs_3, 4) if kappa_2_vs_3 is not None else "Insufficient data",
+    })
+
 
 def export_posts_csv(request):
     posts = PostFeatures.objects.all()
