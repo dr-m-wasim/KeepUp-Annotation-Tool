@@ -141,6 +141,7 @@
                         <th>Likes</th>
                         <th>Views</th>
                         <th>Shares</th>
+                        <th>Comments</th>
                         <th>Student Label</th>
                         {% if  request.session.annotator == 'annotatorone' %}
                         <th>A. One</th> <!-- New Column -->
@@ -173,6 +174,7 @@
                         <td>{{ post.likescount }}</td>
                         <td>{{ post.views }}</td>
                         <td>{{ post.shares }}</td>
+                        <td>{{ post.comment_count }}</td>
                         <td>{{ post.post_label }}</td>
                         {% if  request.session.annotator == 'annotatorone' %}
                         <td>{{ post.annotatorOne_post_label }}</td>

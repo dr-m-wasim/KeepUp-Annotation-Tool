@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Events, PostFeatures, Comments
 from django.urls import reverse
 from django.http import HttpResponseBadRequest
+from django.db import models
 
 def annotator_select(request):
     if request.method == 'POST':
@@ -18,6 +19,21 @@ def events_list(request):
 def event_posts(request, event_id):
     event = get_object_or_404(Events, event_id=event_id)
     posts = PostFeatures.objects.filter(event_id=event_id)
+
+    # Create a dictionary of comment counts keyed by post_id
+    comment_counts = (
+        Comments.objects
+        .filter(post_id__in=[post.post_id for post in posts])
+        .values('post_id')
+        .annotate(count=models.Count('comment_id'))
+    )
+    # Convert to a dictionary for quick lookup
+    comment_count_dict = {item['post_id']: item['count'] for item in comment_counts}
+
+    # Attach comment count to each post
+    for post in posts:
+        post.comment_count = comment_count_dict.get(post.post_id, 0)
+
     return render(request, 'eventpostshub.html', {'event': event, 'posts': posts})
 
 
