@@ -7,6 +7,7 @@ import csv
 from django.http import JsonResponse
 from collections import Counter
 from django.db.models import Q
+from django.db import connection
 
 def compute_fleiss_kappa(matrix):
     n = sum(matrix[0])  # Number of raters per item
@@ -378,11 +379,27 @@ def post_editor(request, event_id):
 def post_comments_view(request, post_id, event_id):
     event = get_object_or_404(Events, event_id=event_id)
     comments = Comments.objects.filter(post_id=post_id)
+
+
+    with connection.cursor() as cursor:
+        cursor.execute(f'''
+                SELECT comment_id
+            FROM comments
+            WHERE "post-id"= {post_id} AND (annotatorTwo_comment_label IS NULL OR annotatorTwo_comment_label = 'None')
+            ORDER BY comment_id ASC
+            LIMIT 1;
+            ''')
+        row = cursor.fetchone()
+        value = row[0] if row else None
+
+
+
     context = {
         'event': event,
         'post_id': post_id,
         'event_id': event_id,  # Pass event_id to the context
         'comments': comments,
+        'current_comment': value
     }
     return render(request, 'postcommenthub.html', context)
     

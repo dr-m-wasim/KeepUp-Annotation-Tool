@@ -17,12 +17,6 @@ class Events(models.Model):
     claim_url = models.TextField(db_column='claim-url', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     posturl = models.TextField(blank=True, null=True)
     label = models.IntegerField(blank=True, null=True)
-    unnamed_8 = models.FloatField(db_column='Unnamed: 8', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    unnamed_9 = models.FloatField(db_column='Unnamed: 9', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    unnamed_10 = models.FloatField(db_column='Unnamed: 10', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    unnamed_11 = models.FloatField(db_column='Unnamed: 11', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    unnamed_12 = models.FloatField(db_column='Unnamed: 12', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    unnamed_13 = models.TextField(db_column='Unnamed: 13', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
     class Meta:
         managed = False
