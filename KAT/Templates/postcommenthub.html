@@ -67,9 +67,12 @@
 
 <div class="container my-5">
 
-    <p>Comments related to Post ID: {{ post_id }}</p>
-    <p><strong>Event ID:</strong> {{ event_id }}</p>
-    <p><strong>Claim:</strong> {{ event.claim }}</p>
+    <!-- <div class="alert alert-primary" role="alert">
+        <h4>Post ID: {{ post_id }}</h2>
+        <p><strong>Event ID:</strong> {{ event_id }}</p>
+        <p><strong>Claim:</strong> {{ event.claim }}</p>
+</div>
+    -->
 
     <div class="container text-center my-3">
 
@@ -79,52 +82,33 @@
             ⬅️ Back to Posts
         </a>
 
-    {% if comments %}
-        <a href="{% url 'comment_editor' post_id=post_id event_id=event_id comment_index=current_comment %}" class="btn btn-primary">
-            Open Comment Editor
-        </a>
-    {% else %}
-        <p>No comments available to edit.</p>
-    {% endif %}
 </div>
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered align-middle">
             <thead>
                 <tr>
-                    <th>Comment ID</th>
-                    <th>Commenter Name</th>
-                    <th>Comment Text</th>
+                    <th>ID</th>
+                    <!-- <th>Commenter Name</th> -->
+                    <th class="text-start">Comment Text</th>
                     <th>Likes</th>
-                    <th>Label</th>
-                    {% if  request.session.annotator == 'annotatorone' %}
-                    <th>A. One</th>
-                    {% endif %}
-                    {% if  request.session.annotator == 'annotatortwo' %}
-                    <th>A. Two</th>
-                    {% endif %}
-                    {% if  request.session.annotator == 'annotatorthree' %}
-                    <th>A. Three</th>
-                    {% endif %}
+                    <th>Student Label</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for comment in comments %}
                 <tr>
                     <td>{{ comment.comment_id }}</td>
-                    <td>{{ comment.commenter_name }}</td>
+                    <!-- <td>{{ comment.commenter_name }}</td> -->
                     <td>{{ comment.commenttext }}</td>
                     <td>{{ comment.likescount_on_comment }}</td>
                     <td>{{ comment.comment_label }}</td>
-
-                    {% if  request.session.annotator == 'annotatorone' %}
-                    <td>{{ comment.annotatorOne_comment_label }}</td>
-                    {% endif %}
-                    {% if  request.session.annotator == 'annotatortwo' %}
-                    <td>{{ comment.annotatorTwo_comment_label }}</td>
-                    {% endif %}
-                    {% if  request.session.annotator == 'annotatorthree' %}
-                    <td>{{ comment.annotatorThree_comment_label }}</td>
-                    {% endif %}
+                    <td><a href="{% url 'edit_comment' comment.post_id|floatformat:0|add:'0' comment.comment_id %}" 
+                        class="btn btn-sm btn-outline-primary" 
+                        style="cursor: pointer;">
+                        Edit
+                     </a></td>
+                   
                 </tr>
                 {% empty %}
                 <tr>

@@ -32,7 +32,7 @@ class PostFeaturesForm(forms.ModelForm):
     class Meta:
        
         model = PostFeatures
-        fields = ['post_title', 'likescount', 'commentscount', 'views', 'shares', 'reposts', 'post_label', 'annotatorOne_post_label', 
+        fields = ['post_title', 'likescount', 'commentscount', 'views', 'shares', 'reposts', 'post_label', 'platform', 'post_url', 'annotatorOne_post_label', 
                   'annotatorTwo_post_label', 'annotatorThree_post_label']
         
 

@@ -131,11 +131,11 @@
                         <td>{{ event.event_name }}</td>
                         <td>{{ event.claim }}</td>
                         <td><a href="{{ event.claim_url }}" target="_blank"
-                                class="btn btn-sm btn-outline-primary">Claim</a></td>
+                                class="btn btn-sm btn-outline-primary">View Claim</a></td>
                         <td><a href="{{ event.posturl }}" target="_blank"
-                                class="btn btn-sm btn-outline-success">Social</a></td>
+                                class="btn btn-sm btn-outline-primary">Social Media</a></td>
                         <td><a href="{% url 'eventposts' event.event_id %}"
-                                class="btn btn-sm btn-outline-success">Posts</a></td>
+                                class="btn btn-sm btn-outline-primary">{{ event.posts.count }} Posts</a></td>
 
                         <td>{{ event.label|yesno:"Fake,Real" }}</td>
                     </tr>

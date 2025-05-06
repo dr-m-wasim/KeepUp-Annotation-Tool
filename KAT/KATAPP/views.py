@@ -1,4 +1,4 @@
-from django import template
+from django import forms, template
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Events, PostFeatures, Comments, UserFeatures
 from django.urls import reverse
@@ -280,13 +280,18 @@ def annotator_select(request):
     context = {
         'post_progress': post_progress,
         'comment_progress': comment_progress,
+        'total_posts' : total_posts,
+        'total_comments' : total_comments
     }
 
     return render(request, 'annotator_selector.html', context)
 
 def events_list(request):
-    events = Events.objects.all()
-    return render(request, 'events.html', {'events': events})
+    events = Events.objects.all().prefetch_related('posts')
+
+    return render(request, 'events.html', {
+        'events': events
+        })
 
 def event_posts(request, event_id):
     event = get_object_or_404(Events, event_id=event_id)
@@ -494,11 +499,15 @@ def edit_post(request, post_id):
 
     if request.method == 'POST':
         form = PostFeaturesForm(request.POST, instance=post)
+        form.fields['platform'].widget = forms.HiddenInput()
+        
         if form.is_valid():
             form.save()
             return redirect('eventposts', post.event_id)  # Redirect after saving
     else:
         form = PostFeaturesForm(instance=post)
+        form.fields['platform'].widget = forms.HiddenInput()
+        form.fields['post_url'].widget = forms.HiddenInput()
         
         if request.session['annotator'] == 'annotatorone':
             form.fields['annotatorOne_post_label'].required = True
@@ -516,4 +525,15 @@ def edit_post(request, post_id):
     return render(request, 'edit_post.html', {
         'event' : event,
         'form': form
+        })
+
+def edit_comment(request, post_id, comment_id):
+    
+    print(comment_id, post_id)
+    
+    comment = get_object_or_404(Comments, pk=comment_id)
+    post = get_object_or_404(PostFeatures, pk=post_id)
+    
+    return render(request, 'edit_comment.html', {
+
         })
