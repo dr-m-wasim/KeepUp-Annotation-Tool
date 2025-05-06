@@ -1,3 +1,4 @@
+from django import template
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Events, PostFeatures, Comments, UserFeatures
 from django.urls import reverse
@@ -8,6 +9,7 @@ from django.http import JsonResponse
 from collections import Counter
 from django.db.models import Q
 from django.db import connection
+from .forms import PostFeaturesForm
 
 def compute_fleiss_kappa(matrix):
     n = sum(matrix[0])  # Number of raters per item
@@ -304,7 +306,13 @@ def event_posts(request, event_id):
     for post in posts:
         post.comment_count = comment_count_dict.get(post.post_id, 0)
 
-    return render(request, 'eventpostshub.html', {'event': event, 'posts': posts})
+    annotator_map = {
+        'annotatorone' : 'annotatorOne_post_label',
+        'annotatortwo' : 'annotatorTwo_post_label',
+        'annotatorthree' : 'annotatorThree_post_label'
+    }
+
+    return render(request, 'eventpostshub.html', {'event': event, 'posts': posts, 'annotator': annotator_map[request.session['annotator']] })
 
 
 def post_editor(request, event_id):
@@ -392,8 +400,6 @@ def post_comments_view(request, post_id, event_id):
         row = cursor.fetchone()
         value = row[0] if row else None
 
-
-
     context = {
         'event': event,
         'post_id': post_id,
@@ -479,3 +485,35 @@ def comment_editor(request, post_id, event_id, comment_index):
         'selected_label': selected_label,
         'annotator': annotator,
     })
+
+
+def edit_post(request, post_id):
+    post = get_object_or_404(PostFeatures, pk=post_id)
+    event_id = post.event_id
+    event = get_object_or_404(Events, pk=event_id)
+
+    if request.method == 'POST':
+        form = PostFeaturesForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('eventposts', post.event_id)  # Redirect after saving
+    else:
+        form = PostFeaturesForm(instance=post)
+        
+        if request.session['annotator'] == 'annotatorone':
+            form.fields['annotatorOne_post_label'].required = True
+            del form.fields['annotatorTwo_post_label']
+            del form.fields['annotatorThree_post_label']
+        elif request.session['annotator'] == 'annotatortwo':
+            form.fields['annotatorTwo_post_label'].required = True
+            del form.fields['annotatorOne_post_label']
+            del form.fields['annotatorThree_post_label']
+        elif request.session['annotator'] == 'annotatorthree':
+            form.fields['annotatorThree_post_label'].required = True
+            del form.fields['annotatorTwo_post_label']
+            del form.fields['annotatorOne_post_label']
+    
+    return render(request, 'edit_post.html', {
+        'event' : event,
+        'form': form
+        })
