@@ -13,4 +13,5 @@ urlpatterns = [
     path('event/<str:event_id>/post_editor/', views.post_editor, name='post_editor'),
     path('postcomments/<int:post_id>/<str:event_id>/', views.post_comments_view, name='postcomments'),  # Modified
     path('comment_editor/<int:post_id>/<str:event_id>/<int:comment_index>/', views.comment_editor, name='comment_editor'),
+    path('post/<int:post_id>/edit/', views.edit_post, name='edit_post'),
 ]

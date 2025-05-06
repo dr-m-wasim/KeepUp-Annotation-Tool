@@ -13,7 +13,7 @@ class Events(models.Model):
     student_name = models.TextField(db_column='Student name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     event_id = models.TextField(db_column='Event-id', blank=True, null=False, primary_key=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     event_name = models.TextField(db_column='Event Name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    claim = models.TextField(blank=True, null=True)
+    claim = models.CharField(max_length=500)
     claim_url = models.TextField(db_column='claim-url', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     posturl = models.TextField(blank=True, null=True)
     label = models.IntegerField(blank=True, null=True)
@@ -151,22 +151,22 @@ class DjangoSession(models.Model):
 
 
 class PostFeatures(models.Model):
-    event_id = models.TextField(db_column='Event-id', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    event_id = models.CharField(db_column='Event-id', max_length=7)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     post_id = models.IntegerField(db_column='post-id', blank=True, null=False, primary_key=True)  # Field renamed to remove unsuitable characters.
     post_url = models.TextField(db_column='post-url', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     platform = models.TextField(blank=True, null=True)
     post_title = models.TextField(db_column='post-title', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    post_label = models.TextField(db_column='post-label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    post_label = models.CharField(db_column='post-label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     image_image_0_video_1_if_no_image_video_2_field = models.IntegerField(db_column='image(image 0, video 1, if no image video 2)', blank=True, null=True)  # Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-    likescount = models.TextField(blank=True, null=True)
+    likescount = models.CharField(blank=True, null=True)
     timestamp = models.TextField(blank=True, null=True)
     commentscount = models.IntegerField(blank=True, null=True)
-    views = models.TextField(blank=True, null=True)
-    shares = models.TextField(blank=True, null=True)
-    reposts = models.TextField(blank=True, null=True)
-    annotatorOne_post_label = models.TextField(db_column='annotatorOne_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    annotatorTwo_post_label = models.TextField(db_column='annotatorTwo_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    annotatorThree_post_label = models.TextField(db_column='annotatorThree_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    views = models.CharField(blank=True, null=True)
+    shares = models.CharField(blank=True, null=True)
+    reposts = models.CharField(blank=True, null=True)
+    annotatorOne_post_label = models.CharField(db_column='annotatorOne_post_label', blank=True, null=True, )  # Field renamed to remove unsuitable characters.
+    annotatorTwo_post_label = models.CharField(db_column='annotatorTwo_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    annotatorThree_post_label = models.CharField(db_column='annotatorThree_post_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
 
 
     class Meta:
