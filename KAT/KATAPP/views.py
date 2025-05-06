@@ -54,6 +54,49 @@ def compute_cohen_kappa(labels1, labels2):
         return 1.0  # Avoid division by zero
     return (observed_agreement - expected_agreement) / (1 - expected_agreement)
 
+def compute_fleiss_kappa(matrix):
+    n = sum(matrix[0])  # Number of raters per item
+    N = len(matrix)     # Number of items
+    k = len(matrix[0])  # Number of categories
+
+    # Proportion of ratings in each category
+    pj = [sum(row[j] for row in matrix) / (N * n) for j in range(k)]
+
+    # Agreement for each item
+    Pi = []
+    for row in matrix:
+        row_sum = sum(row)
+        agreement = sum([count * (count - 1) for count in row])
+        Pi.append(agreement / (row_sum * (row_sum - 1)))
+
+    P_bar = sum(Pi) / N
+    P_e_bar = sum([p**2 for p in pj])
+
+    if P_e_bar == 1:
+        return 1.0
+    return (P_bar - P_e_bar) / (1 - P_e_bar)
+
+def compute_cohen_kappa(labels1, labels2):
+    assert len(labels1) == len(labels2), "Label lists must be same length"
+
+    total = len(labels1)
+    labels = set(labels1) | set(labels2)
+    
+    # Count label agreements and distributions
+    observed_agreement = sum([1 for a, b in zip(labels1, labels2) if a == b]) / total
+
+    label_counts_1 = Counter(labels1)
+    label_counts_2 = Counter(labels2)
+
+    expected_agreement = sum(
+        (label_counts_1[label] / total) * (label_counts_2[label] / total)
+        for label in labels
+    )
+
+    if expected_agreement == 1:
+        return 1.0  # Avoid division by zero
+    return (observed_agreement - expected_agreement) / (1 - expected_agreement)
+
 def calculate_kappa_scores(request):
     comments = Comments.objects.filter(
         ~Q(annotatorOne_comment_label=None),
