@@ -20,8 +20,9 @@ KAT - Edit Comment
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save</button>
         <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+        <button type="submit" name="action" class="btn btn-primary" value="'save"> Save </button>
+        <button type="submit" name="action" class="btn btn-primary" value="next"> Save and Next</button>
     </form>
 
 </div>

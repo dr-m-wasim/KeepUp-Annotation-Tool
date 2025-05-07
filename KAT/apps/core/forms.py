@@ -71,21 +71,21 @@ class CommentsForm(forms.ModelForm):
             ('comment', 'Comment')
         ]
     
-    annotatorOne_post_label = forms.ChoiceField(
+    annotatorOne_comment_label = forms.ChoiceField(
         choices=OPTIONS, 
          widget=forms.Select(attrs={'class': 'form-control'}),
          label="Your Label:",
          required=False
     )
 
-    annotatorTwo_post_label =  forms.ChoiceField(
+    annotatorTwo_comment_label =  forms.ChoiceField(
         choices=OPTIONS, 
         widget=forms.Select(attrs={'class': 'form-control'}),
         label="Your Label:",
         required=False
     )
 
-    annotatorThree_post_label = forms.ChoiceField(
+    annotatorThree_comment_label = forms.ChoiceField(
         choices=OPTIONS, 
         widget=forms.Select(attrs={'class': 'form-control'}),
         label="Your Label:",
@@ -94,8 +94,8 @@ class CommentsForm(forms.ModelForm):
     class Meta:
        
         model = Comments
-        fields = ['commenttext', 'comment_label', 'label', 'annotatorOne_post_label', 
-                  'annotatorTwo_post_label', 'annotatorThree_post_label']
+        fields = ['commenttext', 'comment_label', 'label', 'annotatorOne_comment_label', 
+                  'annotatorTwo_comment_label', 'annotatorThree_comment_label']
         
         widgets = {
             'commenttext': forms.Textarea(attrs={'rows': 4, 'cols': 170, 'class': 'form-control'})

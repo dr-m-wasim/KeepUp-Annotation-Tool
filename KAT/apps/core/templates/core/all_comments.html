@@ -1,5 +1,5 @@
 {% extends 'core/layout.html' %}
-
+{% load custom_filters %}
 {% block title %}
 KAT - All Comments
 {% endblock %}
@@ -29,7 +29,7 @@ KAT - All Comments
                 </thead>
                 <tbody>
                     {% for comment in comments %}
-                    <tr>
+                    <tr class="{% if comment|attr:annotator != '' and comment|attr:annotator != 'None' %}table-success{% endif %}"">
                         <td>{{ comment.comment_id }}</td>
                         <!-- <td>{{ comment.commenter_name }}</td> -->
                         <td>{{ comment.commenttext }}</td>

@@ -10,6 +10,7 @@ from collections import Counter
 from django.db.models import Q
 from django.db import connection
 from .forms import CommentsForm, PostFeaturesForm
+from django.db import transaction
 
 def compute_fleiss_kappa(matrix):
     n = sum(matrix[0])  # Number of raters per item
@@ -440,25 +441,19 @@ def post_editor(request, event_id):
 def post_comments_view(request, post_id, event_id):
     event = get_object_or_404(Events, event_id=event_id)
     comments = Comments.objects.filter(post_id=post_id)
-
-
-    with connection.cursor() as cursor:
-        cursor.execute(f'''
-                SELECT comment_id
-            FROM comments
-            WHERE "post-id"= {post_id} AND (annotatorTwo_comment_label IS NULL OR annotatorTwo_comment_label = 'None')
-            ORDER BY comment_id ASC
-            LIMIT 1;
-            ''')
-        row = cursor.fetchone()
-        value = row[0] if row else None
+    
+    annotator_map = {
+        'annotatorone' : 'annotatorOne_comment_label',
+        'annotatortwo' : 'annotatorTwo_comment_label',
+        'annotatorthree' : 'annotatorThree_comment_label'
+    }
 
     context = {
         'event': event,
         'post_id': post_id,
         'event_id': event_id,  # Pass event_id to the context
         'comments': comments,
-        'current_comment': value
+        'annotator': annotator_map[request.session['annotator']]
     }
     return render(request, 'core/all_comments.html', context)
     
@@ -575,9 +570,26 @@ def edit_post(request, post_id):
         'form': form
         })
 
-def edit_comment(request, post_id, comment_id):
+def get_query(request, post_id):
     
-    print(comment_id, post_id)
+    annotator = 'annotatorOne_comment_label'
+
+    if request.session['annotator'] == 'annotatortwo':
+        annotator = 'annotatorTwo_comment_label'
+    elif request.session['annotator'] == 'annotatorthree':
+        annotator = 'annotatorThree_comment_label'
+
+    query = f'''
+    SELECT comment_id
+    FROM comments
+    WHERE "post-id"= {post_id} AND ({annotator} IS NULL OR {annotator} = 'None')
+    ORDER BY comment_id ASC
+    LIMIT 1;
+    '''
+
+    return query
+
+def edit_comment(request, post_id, comment_id):
     
     comment = get_object_or_404(Comments, pk=comment_id)
     post = get_object_or_404(PostFeatures, pk=post_id)
@@ -587,22 +599,36 @@ def edit_comment(request, post_id, comment_id):
         
         if form.is_valid():
             form.save()
+            
+            action = request.POST.get('action')
+            
+            if action == 'next':
+
+                with connection.cursor() as cursor:
+                    cursor.execute(get_query(request, post.post_id))
+                    row = cursor.fetchone()
+                    value = row[0] if row else None
+                    print(value)
+                if value is not None:
+                    return redirect('edit_comment', post.post_id, value)
+            
             return redirect('postcomments', post.post_id, post.event_id)
+            
     else:
         form = CommentsForm(instance=comment)
         
         if request.session['annotator'] == 'annotatorone':
-            form.fields['annotatorOne_post_label'].required = True
-            del form.fields['annotatorTwo_post_label']
-            del form.fields['annotatorThree_post_label']
+            form.fields['annotatorOne_comment_label'].required = True
+            del form.fields['annotatorTwo_comment_label']
+            del form.fields['annotatorThree_comment_label']
         elif request.session['annotator'] == 'annotatortwo':
-            form.fields['annotatorTwo_post_label'].required = True
-            del form.fields['annotatorOne_post_label']
-            del form.fields['annotatorThree_post_label']
+            form.fields['annotatorTwo_comment_label'].required = True
+            del form.fields['annotatorOne_comment_label']
+            del form.fields['annotatorThree_comment_label']
         elif request.session['annotator'] == 'annotatorthree':
-            form.fields['annotatorThree_post_label'].required = True
-            del form.fields['annotatorTwo_post_label']
-            del form.fields['annotatorOne_post_label']
+            form.fields['annotatorThree_comment_label'].required = True
+            del form.fields['annotatorTwo_comment_label']
+            del form.fields['annotatorOne_comment_label']
 
     return render(request, 'core/edit_comment.html', {
             'post' : post,
