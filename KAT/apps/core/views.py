@@ -330,6 +330,11 @@ def annotator_select(request):
     return render(request, 'annotator_selector.html', context)
 
 def events_list(request):
+    
+    # if no annotator is selected, go back to main page
+    if 'annotator' not in  request.session:
+            return redirect('/')
+    
     events = Events.objects.all().prefetch_related('posts')
 
     return render(request, 'events.html', {
