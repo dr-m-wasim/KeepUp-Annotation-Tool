@@ -287,7 +287,7 @@ def export_comments_csv(request):
 
 
 
-def annotator_select(request):
+def dashboard(request):
     if request.method == 'POST':
         annotator = request.POST.get('annotator')
         if annotator:
@@ -327,7 +327,7 @@ def annotator_select(request):
         'total_comments' : total_comments
     }
 
-    return render(request, 'annotator_selector.html', context)
+    return render(request, 'core/dashboard.html', context)
 
 def events_list(request):
     
@@ -337,7 +337,7 @@ def events_list(request):
     
     events = Events.objects.all().prefetch_related('posts')
 
-    return render(request, 'events.html', {
+    return render(request, 'core/all_events.html', {
         'events': events
         })
 
@@ -365,7 +365,7 @@ def event_posts(request, event_id):
         'annotatorthree' : 'annotatorThree_post_label'
     }
 
-    return render(request, 'eventpostshub.html', {'event': event, 'posts': posts, 'annotator': annotator_map[request.session['annotator']] })
+    return render(request, 'core/all_posts.html', {'event': event, 'posts': posts, 'annotator': annotator_map[request.session['annotator']] })
 
 
 def post_editor(request, event_id):
@@ -460,7 +460,7 @@ def post_comments_view(request, post_id, event_id):
         'comments': comments,
         'current_comment': value
     }
-    return render(request, 'postcommenthub.html', context)
+    return render(request, 'core/all_comments.html', context)
     
 def save_comment(request, post_id):
     if request.method == 'POST':
@@ -582,6 +582,6 @@ def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comments, pk=comment_id)
     post = get_object_or_404(PostFeatures, pk=post_id)
     
-    return render(request, 'edit_comment.html', {
+    return render(request, 'core/edit_comment.html', {
 
         })
