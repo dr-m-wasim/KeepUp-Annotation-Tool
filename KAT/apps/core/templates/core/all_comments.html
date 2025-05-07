@@ -1,0 +1,53 @@
+{% extends 'core/layout.html' %}
+
+{% block title %}
+KAT - All Comments
+{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="container text-center my-3">
+
+            <a href="{% url 'eventposts' event_id %}"
+                class="btn btn-light btn-sm text-primary fw-semibold shadow-sm flex-fill me-2 text-center"
+                style="max-width: 200px; height: 40px; line-height: 26px;">
+                ⬅️ Back to Posts
+            </a>
+
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <!-- <th>Commenter Name</th> -->
+                        <th class="text-start">Comment Text</th>
+                        <th>Likes</th>
+                        <th>Student Label</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comment in comments %}
+                    <tr>
+                        <td>{{ comment.comment_id }}</td>
+                        <!-- <td>{{ comment.commenter_name }}</td> -->
+                        <td>{{ comment.commenttext }}</td>
+                        <td>{{ comment.likescount_on_comment }}</td>
+                        <td>{{ comment.comment_label }}</td>
+                        <td><a href="{% url 'edit_comment' comment.post_id|floatformat:0|add:'0' comment.comment_id %}"
+                                class="btn btn-sm btn-outline-primary" style="cursor: pointer;">
+                                Edit
+                            </a></td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No comments found for this post.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

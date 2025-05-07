@@ -1,0 +1,61 @@
+{% extends 'core/layout.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+View All Posts
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <h3 class="text-center mb-4">📄 Posts Related to Event: {{ event.event_name }}</h3>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Post Title</th>
+                    <th>Platform</th>
+                    <th>Likes</th>
+                    <th>Views</th>
+                    <th>Shares</th>
+                    <th>Comments</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr
+                    class="{% if post|attr:annotator != '' and post|attr:annotator != 'None' %}table-success{% endif %}">
+                    <td>{{ post.post_id }}</td>
+                    <td>{{ post.post_title }}</td>
+                    <td>{{ post.platform }}</td>
+                    <td>{{ post.likescount }}</td>
+                    <td>{{ post.views }}</td>
+                    <td>{{ post.shares }}</td>
+                    <td style="text-align: center;">{{ post.comment_count }}</td>
+
+                    <td class="text-center">
+                        <a href="{% url 'postcomments' post.post_id event.event_id %}"
+                            class="btn btn-sm btn-outline-primary" style="cursor: pointer;">
+                            View Comments
+                        </a>
+                    </td>
+
+                    <td><a href="{% url 'edit_post' post.post_id %}" class="btn btn-sm btn-outline-primary"
+                            style="cursor: pointer;">
+                            Annotate Post
+                        </a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted">No posts available for this event.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

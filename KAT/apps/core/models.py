@@ -95,8 +95,8 @@ class Comments(models.Model):
     commenttext = models.TextField(blank=True, null=True)
     commenter_name = models.TextField(db_column='commenter name', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     likescount_on_comment = models.FloatField(db_column='likescount on comment', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    comment_label = models.TextField(db_column='comment label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    label = models.TextField(db_column='Label', blank=True, null=True)  # Field name made lowercase.
+    comment_label = models.CharField(db_column='comment label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    label = models.CharField(db_column='Label', blank=True, null=True)  # Field name made lowercase.
     annotatorOne_comment_label = models.TextField(db_column='annotatorOne_comment_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     annotatorTwo_comment_label = models.TextField(db_column='annotatorTwo_comment_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     annotatorThree_comment_label = models.TextField(db_column='annotatorThree_comment_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.

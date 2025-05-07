@@ -1,0 +1,33 @@
+{% extends 'core/layout.html' %}
+
+{% block title %}
+KAT - Edit Post
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <div class="alert alert-primary" role="alert">
+        <h4>Event:</h4>
+        {{ event.claim }}
+    </div>
+
+    <div class="p-3 mb-2 {% if event.label == 0 %}bg-success text-white{% else %}bg-warning text-dark{% endif %}">{{
+        event.label|yesno:"Fake,Real" }}</div>
+
+    <h2 style='float:left; margin-right: 15px;'>Edit Post</h2>
+
+    <a href="{{ form.post_url.value }}" target="_blank" class="btn btn-secondary btn-lg" role="button"
+        aria-pressed="true">View Post on {{ form.platform.value }} → </a>
+
+
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+    </form>
+
+</div>
+{% endblock %}

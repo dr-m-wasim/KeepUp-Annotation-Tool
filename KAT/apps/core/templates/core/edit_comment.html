@@ -1,0 +1,30 @@
+{% extends 'core/layout.html' %}
+
+{% block title %}
+KAT - Edit Comment
+{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+
+    <div class="alert alert-primary" role="alert">
+        <h4>Post:</h4>
+        {{ post.post_title }}
+    </div>
+
+    <div class="p-3 mb-2 bg-success text-white">{{ post.post_label|yesno:"Fake,Real" }}</div>
+
+    <h2>Edit Comment</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+    </form>
+
+</div>
+
+
+{% endblock %}

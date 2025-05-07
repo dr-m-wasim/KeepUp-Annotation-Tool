@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from collections import Counter
 from django.db.models import Q
 from django.db import connection
-from .forms import PostFeaturesForm
+from .forms import CommentsForm, PostFeaturesForm
 
 def compute_fleiss_kappa(matrix):
     n = sum(matrix[0])  # Number of raters per item
@@ -570,7 +570,7 @@ def edit_post(request, post_id):
             del form.fields['annotatorTwo_post_label']
             del form.fields['annotatorOne_post_label']
     
-    return render(request, 'edit_post.html', {
+    return render(request, 'core/edit_post.html', {
         'event' : event,
         'form': form
         })
@@ -582,6 +582,29 @@ def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comments, pk=comment_id)
     post = get_object_or_404(PostFeatures, pk=post_id)
     
-    return render(request, 'core/edit_comment.html', {
+    if request.method == 'POST':
+        form = CommentsForm(request.POST, instance=comment)
+        
+        if form.is_valid():
+            form.save()
+            return redirect('postcomments', post.post_id, post.event_id)
+    else:
+        form = CommentsForm(instance=comment)
+        
+        if request.session['annotator'] == 'annotatorone':
+            form.fields['annotatorOne_post_label'].required = True
+            del form.fields['annotatorTwo_post_label']
+            del form.fields['annotatorThree_post_label']
+        elif request.session['annotator'] == 'annotatortwo':
+            form.fields['annotatorTwo_post_label'].required = True
+            del form.fields['annotatorOne_post_label']
+            del form.fields['annotatorThree_post_label']
+        elif request.session['annotator'] == 'annotatorthree':
+            form.fields['annotatorThree_post_label'].required = True
+            del form.fields['annotatorTwo_post_label']
+            del form.fields['annotatorOne_post_label']
 
+    return render(request, 'core/edit_comment.html', {
+            'post' : post,
+            'form': form
         })
