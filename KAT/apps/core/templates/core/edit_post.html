@@ -12,8 +12,7 @@ KAT - Edit Post
         {{ event.claim }}
     </div>
 
-    <div class="p-3 mb-2 {% if event.label == 0 %}bg-success text-white{% else %}bg-warning text-dark{% endif %}">{{
-        event.label|yesno:"Fake,Real" }}</div>
+    <div class="p-3 mb-2 {% if event.label == 0 %}bg-success text-white{% else %}bg-warning text-dark{% endif %}">{{event.label|yesno:"Fake,Real" }}</div>
 
     <h2 style='float:left; margin-right: 15px;'>Edit Post</h2>
 
