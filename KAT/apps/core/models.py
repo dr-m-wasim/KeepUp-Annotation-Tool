@@ -176,7 +176,7 @@ class PostFeatures(models.Model):
 
 
 class UserFeatures(models.Model):
-    post_id = models.IntegerField(db_column='post-id', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    post_id = models.IntegerField(db_column='post-id', primary_key=True, blank=True, null=False)  # Field renamed to remove unsuitable characters.
     username = models.TextField(blank=True, null=True)
     followers = models.TextField(blank=True, null=True)
     followings = models.TextField(blank=True, null=True)
