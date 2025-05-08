@@ -22,6 +22,7 @@ View All Posts
                     <th>Views</th>
                     <th>Shares</th>
                     <th>Comments</th>
+                    <th>Final Label</th>
                     <th colspan="2">Actions</th>
                 </tr>
             </thead>
@@ -36,7 +37,7 @@ View All Posts
                     <td>{{ post.views }}</td>
                     <td>{{ post.shares }}</td>
                     <td style="text-align: center;">{{ post.comment_count }}</td>
-
+                    <td> {{ post.final_label }} </td>
                     <td class="text-center">
                         <a href="{% url 'postcomments' post.post_id event.event_id %}"
                             class="btn btn-sm btn-outline-primary" style="cursor: pointer;">

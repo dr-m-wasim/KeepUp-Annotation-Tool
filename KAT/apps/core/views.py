@@ -536,7 +536,25 @@ def comment_editor(request, post_id, event_id, comment_index):
         'annotator': annotator,
     })
 
-
+def manage_annotators(form, annotator):
+    
+    match annotator:
+        case "annotatorone":
+            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorTwo_post_label'].required = False
+            form.fields['annotatorThree_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_post_label'].required = False
+        case "annotatortwo":
+            form.fields['annotatorOne_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorOne_post_label'].required = False
+            form.fields['annotatorThree_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_post_label'].required = False
+        case "annotatorthree":
+            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorTwo_post_label'].required = False
+            form.fields['annotatorOne_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorOne_post_label'].required = False
+            
 def edit_post(request, post_id):
     post = get_object_or_404(PostFeatures, pk=post_id)
     event_id = post.event_id
@@ -545,33 +563,34 @@ def edit_post(request, post_id):
     if request.method == 'POST':
         form = PostFeaturesForm(request.POST, instance=post)
         form.fields['platform'].widget = forms.HiddenInput()
+        form.fields['post_url'].widget = forms.HiddenInput()
+        
+        manage_annotators(form, request.session['annotator'])
         
         if form.is_valid():
-            form.save()
+            
+            final_value = 'None'
+            
+            if form.cleaned_data['annotatorOne_post_label'] != 'None' and \
+            form.cleaned_data['annotatorTwo_post_label'] != 'None' and \
+            form.cleaned_data['annotatorThree_post_label'] != 'None':
+                from statistics import mode
+                ann1 = int(form.cleaned_data['annotatorOne_post_label'])
+                ann2 = int(form.cleaned_data['annotatorTwo_post_label'])
+                ann3 = int(form.cleaned_data['annotatorThree_post_label'])
+                final_value = mode([ann1, ann2, ann3])
+            
+            post_form = form.save(commit=False)  # Don't save to DB yet
+            post_form.final_label = final_value  # Set the value manually
+            post_form.save() 
+    
             return redirect('eventposts', post.event_id)  # Redirect after saving
     else:
         form = PostFeaturesForm(instance=post)
         form.fields['platform'].widget = forms.HiddenInput()
         form.fields['post_url'].widget = forms.HiddenInput()
         
-        if request.session['annotator'] == 'annotatorone':
-            form.fields['annotatorOne_post_label'].required = True
-            #del form.fields['annotatorTwo_post_label']
-            #del form.fields['annotatorThree_post_label']
-            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
-            form.fields['annotatorThree_post_label'].widget = forms.HiddenInput()
-        elif request.session['annotator'] == 'annotatortwo':
-            form.fields['annotatorTwo_post_label'].required = True
-            #del form.fields['annotatorOne_post_label']
-            #del form.fields['annotatorThree_post_label']
-            form.fields['annotatorOne_post_label'].widget = forms.HiddenInput()
-            form.fields['annotatorThree_post_label'].widget = forms.HiddenInput()
-        elif request.session['annotator'] == 'annotatorthree':
-            form.fields['annotatorThree_post_label'].required = True
-            #del form.fields['annotatorTwo_post_label']
-            #del form.fields['annotatorOne_post_label']
-            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
-            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
+        manage_annotators(form, request.session['annotator'])
     
     return render(request, 'core/edit_post.html', {
         'event' : event,

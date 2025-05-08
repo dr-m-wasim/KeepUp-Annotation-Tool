@@ -4,7 +4,7 @@ from .models import PostFeatures, Comments
 class PostFeaturesForm(forms.ModelForm):
 
     OPTIONS = [
-            ('', '-- Select --'),
+            ('None', '-- Select --'),
             ('0', 'Real'),
             ('1', 'Fake'),
         ]
@@ -64,7 +64,7 @@ class PostFeaturesForm(forms.ModelForm):
 class CommentsForm(forms.ModelForm):
 
     OPTIONS = [
-            ('', '-- Select --'),
+            ('None', '-- Select --'),
             ('agree', 'Agree'),
             ('disagree', 'Disagree'),
             ('query', 'Query'),
