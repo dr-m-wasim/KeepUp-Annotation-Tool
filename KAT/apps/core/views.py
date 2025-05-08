@@ -192,8 +192,10 @@ def export_events_csv(request):
     writer = csv.writer(response)
     writer.writerow([
         'Student ID', 'Student Name', 'Event ID', 'Event Name', 'Claim', 'Claim URL',
-        'Post URL', 'Label', 'Unnamed: 8', 'Unnamed: 9', 'Unnamed: 10',
-        'Unnamed: 11', 'Unnamed: 12', 'Unnamed: 13'
+        'Post URL', 'Label', 
+        
+        #'Unnamed: 8', 'Unnamed: 9', 'Unnamed: 10',
+        #'Unnamed: 11', 'Unnamed: 12', 'Unnamed: 13'
     ])
 
     for event in events:
@@ -206,12 +208,12 @@ def export_events_csv(request):
             event.claim_url,
             event.posturl,
             event.label,
-            event.unnamed_8,
-            event.unnamed_9,
-            event.unnamed_10,
-            event.unnamed_11,
-            event.unnamed_12,
-            event.unnamed_13
+            # event.unnamed_8,
+            # event.unnamed_9,
+            # event.unnamed_10,
+            # event.unnamed_11,
+            # event.unnamed_12,
+            # event.unnamed_13
         ])
     return response
 
