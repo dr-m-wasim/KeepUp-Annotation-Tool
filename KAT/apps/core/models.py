@@ -95,8 +95,8 @@ class Comments(models.Model):
     commenttext = models.TextField(blank=True, null=True)
     commenter_name = models.TextField(db_column='commenter name', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     likescount_on_comment = models.FloatField(db_column='likescount on comment', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    comment_label = models.CharField(db_column='comment label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    label = models.CharField(db_column='Label', blank=True, null=True)  # Field name made lowercase.
+    comment_label = models.CharField(db_column='comment label', max_length=13, blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    label = models.CharField(db_column='label', max_length=8, blank=True, null=True)  # Field name made lowercase.
     annotatorOne_comment_label = models.TextField(db_column='annotatorOne_comment_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     annotatorTwo_comment_label = models.TextField(db_column='annotatorTwo_comment_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     annotatorThree_comment_label = models.TextField(db_column='annotatorThree_comment_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
@@ -157,17 +157,17 @@ class PostFeatures(models.Model):
     post_url = models.TextField(db_column='post-url', blank=True, null=True) 
     platform = models.TextField(blank=True, null=True)
     post_title = models.TextField(db_column='post-title', blank=True, null=True)
-    post_label = models.CharField(db_column='post-label', blank=True, null=True)
+    post_label = models.CharField(db_column='post-label', max_length=10, blank=True, null=True)
     image_image_0_video_1_if_no_image_video_2_field = models.IntegerField(db_column='image(image 0, video 1, if no image video 2)', blank=True, null=True) 
-    likescount = models.CharField(blank=True, null=True)
+    likescount = models.CharField(max_length=10, blank=True, null=True)
     timestamp = models.TextField(blank=True, null=True)
     commentscount = models.IntegerField(blank=True, null=True)
-    views = models.CharField(blank=True, null=True)
-    shares = models.CharField(blank=True, null=True)
-    reposts = models.CharField(blank=True, null=True)
-    annotatorOne_post_label = models.CharField(db_column='annotatorOne_post_label', blank=True, null=True, ) 
-    annotatorTwo_post_label = models.CharField(db_column='annotatorTwo_post_label', blank=True, null=True)  
-    annotatorThree_post_label = models.CharField(db_column='annotatorThree_post_label', blank=True, null=True) 
+    views = models.CharField(max_length=5, blank=True, null=True)
+    shares = models.CharField(max_length=6, blank=True, null=True)
+    reposts = models.CharField(max_length=7, blank=True, null=True)
+    annotatorOne_post_label = models.CharField(db_column='annotatorOne_post_label', max_length=23, blank=True, null=True, ) 
+    annotatorTwo_post_label = models.CharField(db_column='annotatorTwo_post_label', max_length=23, blank=True, null=True)  
+    annotatorThree_post_label = models.CharField(db_column='annotatorThree_post_label', max_length=25, blank=True, null=True) 
 
 
     class Meta:
