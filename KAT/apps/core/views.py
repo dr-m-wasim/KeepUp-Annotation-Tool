@@ -554,16 +554,22 @@ def edit_post(request, post_id):
         
         if request.session['annotator'] == 'annotatorone':
             form.fields['annotatorOne_post_label'].required = True
-            del form.fields['annotatorTwo_post_label']
-            del form.fields['annotatorThree_post_label']
+            #del form.fields['annotatorTwo_post_label']
+            #del form.fields['annotatorThree_post_label']
+            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_post_label'].widget = forms.HiddenInput()
         elif request.session['annotator'] == 'annotatortwo':
             form.fields['annotatorTwo_post_label'].required = True
-            del form.fields['annotatorOne_post_label']
-            del form.fields['annotatorThree_post_label']
+            #del form.fields['annotatorOne_post_label']
+            #del form.fields['annotatorThree_post_label']
+            form.fields['annotatorOne_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_post_label'].widget = forms.HiddenInput()
         elif request.session['annotator'] == 'annotatorthree':
             form.fields['annotatorThree_post_label'].required = True
-            del form.fields['annotatorTwo_post_label']
-            del form.fields['annotatorOne_post_label']
+            #del form.fields['annotatorTwo_post_label']
+            #del form.fields['annotatorOne_post_label']
+            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
+            form.fields['annotatorTwo_post_label'].widget = forms.HiddenInput()
     
     return render(request, 'core/edit_post.html', {
         'event' : event,
