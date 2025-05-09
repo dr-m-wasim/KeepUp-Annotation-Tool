@@ -1,5 +1,5 @@
 from django import forms
-from .models import PostFeatures, Comments
+from .models import PostFeatures, Comments, UserFeatures
 
 class PostFeaturesForm(forms.ModelForm):
 
@@ -115,3 +115,29 @@ class CommentsForm(forms.ModelForm):
             # set these fields read-only
             for field in ['comment_label', 'label']:
                 self.fields[field].disabled = True  
+
+class UserFeaturesForm(forms.ModelForm): 
+     
+     def __init__(self, *args, **kwargs):
+            super(UserFeaturesForm, self).__init__(*args, **kwargs)
+            
+            self.fields['username'].widget.attrs.update({'class': 'form-control'})
+            self.fields['followers'].widget.attrs.update({'class': 'form-control'})
+            self.fields['followings'].widget.attrs.update({'class': 'form-control'})
+            self.fields['posts_count'].widget.attrs.update({'class': 'form-control'})
+            self.fields['joining_date'].widget.attrs.update({'class': 'form-control'})
+
+            # set these fields read-only
+            for field in ['joining_date']:
+                self.fields[field].disabled = True  
+
+     class Meta:
+        model = UserFeatures
+        fields = ['username', 'followers', 'followings', 'posts_count', 'joining_date']
+        labels = {
+             'username' : "Username:",
+             'followers' : 'Followers',
+             'followings' : 'Followings',
+             "posts_count" : "Posts Count",
+             "joining_date" : "Joining Date"
+        }

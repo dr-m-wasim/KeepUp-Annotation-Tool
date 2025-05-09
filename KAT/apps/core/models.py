@@ -177,13 +177,13 @@ class PostFeatures(models.Model):
 
 class UserFeatures(models.Model):
     post_id = models.IntegerField(db_column='post-id', primary_key=True, default=0)
-    username = models.TextField(blank=True, null=True)
-    followers = models.TextField(blank=True, null=True)
-    followings = models.TextField(blank=True, null=True)
+    username = models.CharField(blank=True, null=True, max_length=51)
+    followers = models.CharField(blank=True, null=True, max_length=17)
+    followings = models.CharField(blank=True, null=True, max_length=20)
     is_user_verified_0_verified_1_unverified_field = models.IntegerField(db_column='is user verified(0 verified, 1 unverified)', blank=True, null=True) 
     profile_pic_url = models.TextField(db_column='profile pic url', blank=True, null=True)
-    posts_count = models.TextField(db_column='posts count', blank=True, null=True) 
-    joining_date = models.TextField(db_column='joining date', blank=True, null=True)
+    posts_count = models.CharField(db_column='posts count', blank=True, null=True, max_length=13) 
+    joining_date = models.CharField(db_column='joining date', blank=True, null=True, max_length=24)
 
     class Meta:
         managed = True

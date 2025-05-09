@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from collections import Counter
 from django.db.models import Q
 from django.db import connection
-from .forms import CommentsForm, PostFeaturesForm
+from .forms import CommentsForm, PostFeaturesForm, UserFeaturesForm
 from django.db import transaction
 
 def compute_fleiss_kappa(matrix):
@@ -557,17 +557,20 @@ def manage_annotators(form, annotator):
             
 def edit_post(request, post_id):
     post = get_object_or_404(PostFeatures, pk=post_id)
+    user = get_object_or_404(UserFeatures, pk=post_id)
     event_id = post.event_id
     event = get_object_or_404(Events, pk=event_id)
 
     if request.method == 'POST':
         form = PostFeaturesForm(request.POST, instance=post)
+        user_form = UserFeaturesForm(request.POST, instance=user)
+
         form.fields['platform'].widget = forms.HiddenInput()
         form.fields['post_url'].widget = forms.HiddenInput()
         
         manage_annotators(form, request.session['annotator'])
         
-        if form.is_valid():
+        if form.is_valid() and user_form.is_valid():
             
             final_value = 'None'
             
@@ -583,10 +586,13 @@ def edit_post(request, post_id):
             post_form = form.save(commit=False)  # Don't save to DB yet
             post_form.final_label = final_value  # Set the value manually
             post_form.save() 
+            user_form.save()
     
             return redirect('eventposts', post.event_id)  # Redirect after saving
     else:
         form = PostFeaturesForm(instance=post)
+        user_form = UserFeaturesForm(instance=user)
+
         form.fields['platform'].widget = forms.HiddenInput()
         form.fields['post_url'].widget = forms.HiddenInput()
         
@@ -594,7 +600,8 @@ def edit_post(request, post_id):
     
     return render(request, 'core/edit_post.html', {
         'event' : event,
-        'form': form
+        'form': form,
+        'user_form': user_form
         })
 
 def get_query(request, post_id):
