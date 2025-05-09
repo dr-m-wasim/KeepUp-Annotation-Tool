@@ -616,6 +616,32 @@ def get_query(request, post_id):
 
     return query
 
+def manage_comment_annotators(form, annotator):
+    
+    match annotator:
+        case "annotatorone":
+            form.fields['annotatorTwo_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorTwo_comment_label'].required = False
+            form.fields['annotatorThree_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_comment_label'].required = False
+        case "annotatortwo":
+            form.fields['annotatorOne_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorOne_comment_label'].required = False
+            form.fields['annotatorThree_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_comment_label'].required = False
+        case "annotatorthree":
+            form.fields['annotatorTwo_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorTwo_comment_label'].required = False
+            form.fields['annotatorOne_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorOne_comment_label'].required = False
+
+def mode_of_strings(data):
+    from collections import Counter
+    if not data:
+        return None
+    count = Counter(data)
+    return count.most_common(1)[0][0]
+
 def edit_comment(request, post_id, comment_id):
     
     comment = get_object_or_404(Comments, pk=comment_id)
@@ -623,9 +649,24 @@ def edit_comment(request, post_id, comment_id):
     
     if request.method == 'POST':
         form = CommentsForm(request.POST, instance=comment)
-        
+        manage_comment_annotators(form, request.session['annotator'])
+
         if form.is_valid():
-            form.save()
+
+            final_value = 'None'
+            
+            if form.cleaned_data['annotatorOne_comment_label'] != 'None' and \
+                form.cleaned_data['annotatorTwo_comment_label'] != 'None' and \
+                form.cleaned_data['annotatorThree_comment_label'] != 'None':
+                
+                ann1 = form.cleaned_data['annotatorOne_comment_label']
+                ann2 = form.cleaned_data['annotatorTwo_comment_label']
+                ann3 = form.cleaned_data['annotatorThree_comment_label']
+                final_value = mode_of_strings([ann1, ann2, ann3])
+
+            comment_form = form.save(commit=False)  # Don't save to DB yet
+            comment_form.label = final_value  # Set the value manually
+            comment_form.save()     
             
             action = request.POST.get('action')
             
@@ -635,7 +676,6 @@ def edit_comment(request, post_id, comment_id):
                     cursor.execute(get_query(request, post.post_id))
                     row = cursor.fetchone()
                     value = row[0] if row else None
-                    print(value)
                 if value is not None:
                     return redirect('edit_comment', post.post_id, value)
             
@@ -643,19 +683,7 @@ def edit_comment(request, post_id, comment_id):
             
     else:
         form = CommentsForm(instance=comment)
-        
-        if request.session['annotator'] == 'annotatorone':
-            form.fields['annotatorOne_comment_label'].required = True
-            del form.fields['annotatorTwo_comment_label']
-            del form.fields['annotatorThree_comment_label']
-        elif request.session['annotator'] == 'annotatortwo':
-            form.fields['annotatorTwo_comment_label'].required = True
-            del form.fields['annotatorOne_comment_label']
-            del form.fields['annotatorThree_comment_label']
-        elif request.session['annotator'] == 'annotatorthree':
-            form.fields['annotatorThree_comment_label'].required = True
-            del form.fields['annotatorTwo_comment_label']
-            del form.fields['annotatorOne_comment_label']
+        manage_comment_annotators(form, request.session['annotator'])
 
     return render(request, 'core/edit_comment.html', {
             'post' : post,

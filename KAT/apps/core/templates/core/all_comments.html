@@ -34,7 +34,7 @@ KAT - All Comments
                         <!-- <td>{{ comment.commenter_name }}</td> -->
                         <td>{{ comment.commenttext }}</td>
                         <td>{{ comment.likescount_on_comment }}</td>
-                        <td>{{ comment.comment_label }}</td>
+                        <td>{{ comment.label }}</td>
                         <td><a href="{% url 'edit_comment' comment.post_id|floatformat:0|add:'0' comment.comment_id %}"
                                 class="btn btn-sm btn-outline-primary" style="cursor: pointer;">
                                 Edit
