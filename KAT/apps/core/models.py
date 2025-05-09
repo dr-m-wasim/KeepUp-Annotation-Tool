@@ -11,15 +11,15 @@ from django.db import models
 class Events(models.Model):
     student_id = models.FloatField(db_column='student id', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     student_name = models.TextField(db_column='Student name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    event_id = models.TextField(db_column='Event-id', blank=True, null=False, primary_key=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    event_id = models.TextField(db_column='Event-id', primary_key=True, default='0')  # Field name made lowercase. Field renamed to remove unsuitable characters.
     event_name = models.TextField(db_column='Event Name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    claim = models.CharField(max_length=500)
+    claim = models.CharField(max_length=500, default="No claim")
     claim_url = models.TextField(db_column='claim-url', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     posturl = models.TextField(blank=True, null=True)
     label = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Events'
 
 
@@ -102,7 +102,7 @@ class Comments(models.Model):
     annotatorThree_comment_label = models.TextField(db_column='annotatorThree_comment_label', blank=True, null=True)  # Field renamed to remove unsuitable characters.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'comments'
 
 
@@ -152,8 +152,8 @@ class DjangoSession(models.Model):
 
 class PostFeatures(models.Model):
     #event_id = models.CharField(db_column='Event-id', max_length=7) 
-    event = models.ForeignKey(Events, db_column='Event-id', on_delete=models.CASCADE, related_name='posts')
-    post_id = models.IntegerField(db_column='post-id', blank=True, null=False, primary_key=True) 
+    event = models.ForeignKey(Events, db_column='Event-id', on_delete=models.CASCADE, related_name='posts', null=True)
+    post_id = models.IntegerField(db_column='post-id', primary_key=True, default=0) 
     post_url = models.TextField(db_column='post-url', blank=True, null=True) 
     platform = models.TextField(blank=True, null=True)
     post_title = models.TextField(db_column='post-title', blank=True, null=True)
@@ -171,20 +171,20 @@ class PostFeatures(models.Model):
     final_label = models.CharField(db_column='final_label', max_length=8, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'post_features'
 
 
 class UserFeatures(models.Model):
-    post_id = models.IntegerField(db_column='post-id', primary_key=True, blank=True, null=False)  # Field renamed to remove unsuitable characters.
+    post_id = models.IntegerField(db_column='post-id', primary_key=True, default=0)
     username = models.TextField(blank=True, null=True)
     followers = models.TextField(blank=True, null=True)
     followings = models.TextField(blank=True, null=True)
-    is_user_verified_0_verified_1_unverified_field = models.IntegerField(db_column='is user verified(0 verified, 1 unverified)', blank=True, null=True)  # Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-    profile_pic_url = models.TextField(db_column='profile pic url', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    posts_count = models.TextField(db_column='posts count', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    joining_date = models.TextField(db_column='joining date', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    is_user_verified_0_verified_1_unverified_field = models.IntegerField(db_column='is user verified(0 verified, 1 unverified)', blank=True, null=True) 
+    profile_pic_url = models.TextField(db_column='profile pic url', blank=True, null=True)
+    posts_count = models.TextField(db_column='posts count', blank=True, null=True) 
+    joining_date = models.TextField(db_column='joining date', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'user_features'
