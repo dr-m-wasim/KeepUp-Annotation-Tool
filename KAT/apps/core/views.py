@@ -159,7 +159,7 @@ def export_posts_csv(request):
         'Event ID', 'Post ID', 'Post URL', 'Platform', 'Post Title', 'Post Label',
         'Media Type (0-img,1-vid,2)', 'Likes Count', 'Timestamp', 'Comments Count',
         'Views', 'Shares', 'Reposts',
-        'Annotator 1 Post Label', 'Annotator 2 Post Label', 'Annotator 3 Post Label'
+        'Annotator 1 Post Label', 'Annotator 2 Post Label', 'Annotator 3 Post Label', 'final_label'
     ])
 
     for post in posts:
@@ -179,7 +179,8 @@ def export_posts_csv(request):
             post.reposts,
             post.annotatorOne_post_label,
             post.annotatorTwo_post_label,
-            post.annotatorThree_post_label
+            post.annotatorThree_post_label,
+            post.final_label
         ])
     return response
 
@@ -192,10 +193,7 @@ def export_events_csv(request):
     writer = csv.writer(response)
     writer.writerow([
         'Student ID', 'Student Name', 'Event ID', 'Event Name', 'Claim', 'Claim URL',
-        'Post URL', 'Label', 
-        
-        #'Unnamed: 8', 'Unnamed: 9', 'Unnamed: 10',
-        #'Unnamed: 11', 'Unnamed: 12', 'Unnamed: 13'
+        'Post URL', 'Label'  
     ])
 
     for event in events:
@@ -207,13 +205,7 @@ def export_events_csv(request):
             event.claim,
             event.claim_url,
             event.posturl,
-            event.label,
-            # event.unnamed_8,
-            # event.unnamed_9,
-            # event.unnamed_10,
-            # event.unnamed_11,
-            # event.unnamed_12,
-            # event.unnamed_13
+            event.label
         ])
     return response
 
@@ -263,15 +255,16 @@ def export_comments_csv(request):
         label1 = comment.annotatorOne_comment_label
         label2 = comment.annotatorTwo_comment_label
         label3 = comment.annotatorThree_comment_label
+        label = comment.label
 
-        if label1 == label2 and label1:
-            final_label = label1
-        elif label1 == label3 and label1:
-            final_label = label1
-        elif label2 == label3 and label2:
-            final_label = label2
-        else:
-            final_label = ''
+        # if label1 == label2 and label1:
+        #     final_label = label1
+        # elif label1 == label3 and label1:
+        #     final_label = label1
+        # elif label2 == label3 and label2:
+        #     final_label = label2
+        # else:
+        #     final_label = ''
 
         writer.writerow([
             comment.comment_id,
@@ -283,7 +276,7 @@ def export_comments_csv(request):
             label1,
             label2,
             label3,
-            final_label
+            label
         ])
 
     return response
