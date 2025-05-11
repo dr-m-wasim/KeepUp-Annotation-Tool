@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from collections import Counter
 from django.db.models import Q
 from django.db import connection
-from .forms import CommentsForm, PostFeaturesForm
+from .forms import CommentsForm, PostFeaturesForm, UserFeaturesForm
 from django.db import transaction
 
 def compute_fleiss_kappa(matrix):
@@ -159,7 +159,7 @@ def export_posts_csv(request):
         'Event ID', 'Post ID', 'Post URL', 'Platform', 'Post Title', 'Post Label',
         'Media Type (0-img,1-vid,2)', 'Likes Count', 'Timestamp', 'Comments Count',
         'Views', 'Shares', 'Reposts',
-        'Annotator 1 Post Label', 'Annotator 2 Post Label', 'Annotator 3 Post Label'
+        'Annotator 1 Post Label', 'Annotator 2 Post Label', 'Annotator 3 Post Label', 'final_label'
     ])
 
     for post in posts:
@@ -179,7 +179,8 @@ def export_posts_csv(request):
             post.reposts,
             post.annotatorOne_post_label,
             post.annotatorTwo_post_label,
-            post.annotatorThree_post_label
+            post.annotatorThree_post_label,
+            post.final_label
         ])
     return response
 
@@ -192,10 +193,7 @@ def export_events_csv(request):
     writer = csv.writer(response)
     writer.writerow([
         'Student ID', 'Student Name', 'Event ID', 'Event Name', 'Claim', 'Claim URL',
-        'Post URL', 'Label', 
-        
-        #'Unnamed: 8', 'Unnamed: 9', 'Unnamed: 10',
-        #'Unnamed: 11', 'Unnamed: 12', 'Unnamed: 13'
+        'Post URL', 'Label'  
     ])
 
     for event in events:
@@ -207,13 +205,7 @@ def export_events_csv(request):
             event.claim,
             event.claim_url,
             event.posturl,
-            event.label,
-            # event.unnamed_8,
-            # event.unnamed_9,
-            # event.unnamed_10,
-            # event.unnamed_11,
-            # event.unnamed_12,
-            # event.unnamed_13
+            event.label
         ])
     return response
 
@@ -263,15 +255,16 @@ def export_comments_csv(request):
         label1 = comment.annotatorOne_comment_label
         label2 = comment.annotatorTwo_comment_label
         label3 = comment.annotatorThree_comment_label
+        label = comment.label
 
-        if label1 == label2 and label1:
-            final_label = label1
-        elif label1 == label3 and label1:
-            final_label = label1
-        elif label2 == label3 and label2:
-            final_label = label2
-        else:
-            final_label = ''
+        # if label1 == label2 and label1:
+        #     final_label = label1
+        # elif label1 == label3 and label1:
+        #     final_label = label1
+        # elif label2 == label3 and label2:
+        #     final_label = label2
+        # else:
+        #     final_label = ''
 
         writer.writerow([
             comment.comment_id,
@@ -283,7 +276,7 @@ def export_comments_csv(request):
             label1,
             label2,
             label3,
-            final_label
+            label
         ])
 
     return response
@@ -557,17 +550,20 @@ def manage_annotators(form, annotator):
             
 def edit_post(request, post_id):
     post = get_object_or_404(PostFeatures, pk=post_id)
+    user = get_object_or_404(UserFeatures, pk=post_id)
     event_id = post.event_id
     event = get_object_or_404(Events, pk=event_id)
 
     if request.method == 'POST':
         form = PostFeaturesForm(request.POST, instance=post)
+        user_form = UserFeaturesForm(request.POST, instance=user)
+
         form.fields['platform'].widget = forms.HiddenInput()
         form.fields['post_url'].widget = forms.HiddenInput()
         
         manage_annotators(form, request.session['annotator'])
         
-        if form.is_valid():
+        if form.is_valid() and user_form.is_valid():
             
             final_value = 'None'
             
@@ -583,10 +579,13 @@ def edit_post(request, post_id):
             post_form = form.save(commit=False)  # Don't save to DB yet
             post_form.final_label = final_value  # Set the value manually
             post_form.save() 
+            user_form.save()
     
             return redirect('eventposts', post.event_id)  # Redirect after saving
     else:
         form = PostFeaturesForm(instance=post)
+        user_form = UserFeaturesForm(instance=user)
+
         form.fields['platform'].widget = forms.HiddenInput()
         form.fields['post_url'].widget = forms.HiddenInput()
         
@@ -594,7 +593,8 @@ def edit_post(request, post_id):
     
     return render(request, 'core/edit_post.html', {
         'event' : event,
-        'form': form
+        'form': form,
+        'user_form': user_form
         })
 
 def get_query(request, post_id):
@@ -616,6 +616,32 @@ def get_query(request, post_id):
 
     return query
 
+def manage_comment_annotators(form, annotator):
+    
+    match annotator:
+        case "annotatorone":
+            form.fields['annotatorTwo_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorTwo_comment_label'].required = False
+            form.fields['annotatorThree_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_comment_label'].required = False
+        case "annotatortwo":
+            form.fields['annotatorOne_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorOne_comment_label'].required = False
+            form.fields['annotatorThree_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorThree_comment_label'].required = False
+        case "annotatorthree":
+            form.fields['annotatorTwo_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorTwo_comment_label'].required = False
+            form.fields['annotatorOne_comment_label'].widget = forms.HiddenInput()
+            form.fields['annotatorOne_comment_label'].required = False
+
+def mode_of_strings(data):
+    from collections import Counter
+    if not data:
+        return None
+    count = Counter(data)
+    return count.most_common(1)[0][0]
+
 def edit_comment(request, post_id, comment_id):
     
     comment = get_object_or_404(Comments, pk=comment_id)
@@ -623,9 +649,24 @@ def edit_comment(request, post_id, comment_id):
     
     if request.method == 'POST':
         form = CommentsForm(request.POST, instance=comment)
-        
+        manage_comment_annotators(form, request.session['annotator'])
+
         if form.is_valid():
-            form.save()
+
+            final_value = 'None'
+            
+            if form.cleaned_data['annotatorOne_comment_label'] != 'None' and \
+                form.cleaned_data['annotatorTwo_comment_label'] != 'None' and \
+                form.cleaned_data['annotatorThree_comment_label'] != 'None':
+                
+                ann1 = form.cleaned_data['annotatorOne_comment_label']
+                ann2 = form.cleaned_data['annotatorTwo_comment_label']
+                ann3 = form.cleaned_data['annotatorThree_comment_label']
+                final_value = mode_of_strings([ann1, ann2, ann3])
+
+            comment_form = form.save(commit=False)  # Don't save to DB yet
+            comment_form.label = final_value  # Set the value manually
+            comment_form.save()     
             
             action = request.POST.get('action')
             
@@ -635,7 +676,6 @@ def edit_comment(request, post_id, comment_id):
                     cursor.execute(get_query(request, post.post_id))
                     row = cursor.fetchone()
                     value = row[0] if row else None
-                    print(value)
                 if value is not None:
                     return redirect('edit_comment', post.post_id, value)
             
@@ -643,19 +683,7 @@ def edit_comment(request, post_id, comment_id):
             
     else:
         form = CommentsForm(instance=comment)
-        
-        if request.session['annotator'] == 'annotatorone':
-            form.fields['annotatorOne_comment_label'].required = True
-            del form.fields['annotatorTwo_comment_label']
-            del form.fields['annotatorThree_comment_label']
-        elif request.session['annotator'] == 'annotatortwo':
-            form.fields['annotatorTwo_comment_label'].required = True
-            del form.fields['annotatorOne_comment_label']
-            del form.fields['annotatorThree_comment_label']
-        elif request.session['annotator'] == 'annotatorthree':
-            form.fields['annotatorThree_comment_label'].required = True
-            del form.fields['annotatorTwo_comment_label']
-            del form.fields['annotatorOne_comment_label']
+        manage_comment_annotators(form, request.session['annotator'])
 
     return render(request, 'core/edit_comment.html', {
             'post' : post,

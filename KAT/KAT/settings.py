@@ -79,6 +79,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'KAT.wsgi.application'
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://keepup-annotation-tool.onrender.com",
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
