@@ -12,12 +12,15 @@ class Events(models.Model):
     student_id = models.FloatField(db_column='student id', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     student_name = models.TextField(db_column='Student name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     event_id = models.TextField(db_column='Event-id', primary_key=True, default='0')  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    event_id = models.TextField(db_column='Event-id', primary_key=True, default='0')  # Field name made lowercase. Field renamed to remove unsuitable characters.
     event_name = models.TextField(db_column='Event Name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    claim = models.CharField(max_length=500, default="No claim")
     claim = models.CharField(max_length=500, default="No claim")
     claim_url = models.TextField(db_column='claim-url', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     posturl = models.TextField(blank=True, null=True)
     label = models.IntegerField(blank=True, null=True)
     class Meta:
+        managed = True
         managed = True
         db_table = 'Events'
 class Comments(models.Model):
@@ -34,10 +37,13 @@ class Comments(models.Model):
 
     class Meta:
         managed = True
+        managed = True
         db_table = 'comments'
 
 class PostFeatures(models.Model):
     #event_id = models.CharField(db_column='Event-id', max_length=7) 
+    event = models.ForeignKey(Events, db_column='Event-id', on_delete=models.CASCADE, related_name='posts', null=True)
+    post_id = models.IntegerField(db_column='post-id', primary_key=True, default=0) 
     event = models.ForeignKey(Events, db_column='Event-id', on_delete=models.CASCADE, related_name='posts', null=True)
     post_id = models.IntegerField(db_column='post-id', primary_key=True, default=0) 
     post_url = models.TextField(db_column='post-url', blank=True, null=True) 
@@ -58,6 +64,7 @@ class PostFeatures(models.Model):
 
     class Meta:
         managed = True
+        managed = True
         db_table = 'post_features'
 
 
@@ -70,11 +77,15 @@ class UserFeatures(models.Model):
     profile_pic_url = models.TextField(db_column='profile pic url', blank=True, null=True)
     posts_count = models.CharField(db_column='posts count', blank=True, null=True, max_length=13) 
     joining_date = models.CharField(db_column='joining date', blank=True, null=True, max_length=24)
+    post_id = models.IntegerField(db_column='post-id', primary_key=True, default=0)
+    username = models.CharField(blank=True, null=True, max_length=51)
+    followers = models.CharField(blank=True, null=True, max_length=17)
+    followings = models.CharField(blank=True, null=True, max_length=20)
+    is_user_verified_0_verified_1_unverified_field = models.IntegerField(db_column='is user verified(0 verified, 1 unverified)', blank=True, null=True) 
+    profile_pic_url = models.TextField(db_column='profile pic url', blank=True, null=True)
+    posts_count = models.CharField(db_column='posts count', blank=True, null=True, max_length=13) 
+    joining_date = models.CharField(db_column='joining date', blank=True, null=True, max_length=24)
 
     class Meta:
         managed = True
-<<<<<<< HEAD
         db_table = 'user_features'
-=======
-        db_table = 'user_features'
->>>>>>> 9de90cfcffcc4e4b24aca63eed9e9c2a98b21847
