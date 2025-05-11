@@ -609,7 +609,7 @@ def get_query(request, post_id):
     query = f'''
     SELECT comment_id
     FROM comments
-    WHERE "post-id"= {post_id} AND ({annotator} IS NULL OR {annotator} = 'None')
+    WHERE "post-id"= {post_id} AND (comments.{annotator} IS NULL OR comments.{annotator} = 'None')
     ORDER BY comment_id ASC
     LIMIT 1;
     '''
